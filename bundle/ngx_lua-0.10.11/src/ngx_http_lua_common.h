@@ -160,27 +160,28 @@ typedef struct {
 } ngx_http_lua_preload_hook_t;
 
 
+//nginx lua 的main级别的配置，主配置
 struct ngx_http_lua_main_conf_s {
     lua_State           *lua;
 
-    ngx_str_t            lua_path;
-    ngx_str_t            lua_cpath;
+    ngx_str_t            lua_path;                 //Lua API的搜索路径
+    ngx_str_t            lua_cpath;                //C API的搜索路径
 
     ngx_cycle_t         *cycle;
     ngx_pool_t          *pool;
 
-    ngx_int_t            max_pending_timers;
+    ngx_int_t            max_pending_timers;        //定时器数量限制
     ngx_int_t            pending_timers;
 
-    ngx_int_t            max_running_timers;
+    ngx_int_t            max_running_timers;        //定时器数量限制
     ngx_int_t            running_timers;
 
     ngx_connection_t    *watcher;  /* for watching the process exit event */
 
 #if (NGX_PCRE)
     ngx_int_t            regex_cache_entries;
-    ngx_int_t            regex_cache_max_entries;
-    ngx_int_t            regex_match_limit;
+    ngx_int_t            regex_cache_max_entries;   //Nginx pcre 正则式缓存限制
+    ngx_int_t            regex_match_limit;         //Nginx pcre 单次正则匹配上限
 
 #if (LUA_HAVE_PCRE_JIT)
     pcre_jit_stack      *jit_stack;
@@ -230,7 +231,7 @@ struct ngx_http_lua_main_conf_s {
     unsigned             requires_access:1;
     unsigned             requires_log:1;
     unsigned             requires_shm:1;
-    unsigned             requires_capture_log:1;
+    unsigned             requires_capture_log:1;            //lua_capture_error_log 执行过的标志
 };
 
 
@@ -259,7 +260,7 @@ union ngx_http_lua_srv_conf_u {
     } balancer;
 };
 
-
+//Nginx lua 在location 级别上的配置
 typedef struct {
 #if (NGX_HTTP_SSL)
     ngx_ssl_t              *ssl;  /* shared by SSL cosockets */
@@ -270,11 +271,9 @@ typedef struct {
     ngx_str_t               ssl_crl;
 #endif
 
-    ngx_flag_t              force_read_body; /* whether force request body to
-                                                be read */
+    ngx_flag_t              force_read_body; /* whether force request body to be read */     //类似于执行 ngx.req.read_body()，大body情况下回卡顿
 
-    ngx_flag_t              enable_code_cache; /* whether to enable
-                                                  code cache */
+    ngx_flag_t              enable_code_cache; /* whether to enable code cache */            //lua 缓存开启关闭
 
     ngx_flag_t              http10_buffering;
 
@@ -335,8 +334,8 @@ typedef struct {
 
     ngx_uint_t                       pool_size;
 
-    ngx_flag_t                       transform_underscores_in_resp_headers;
-    ngx_flag_t                       log_socket_errors;
+    ngx_flag_t                       transform_underscores_in_resp_headers;     //矫正Http头中不规范的下划线用的
+    ngx_flag_t                       log_socket_errors;                         //是否打开cosocket日志
     ngx_flag_t                       check_client_abort;
     ngx_flag_t                       use_default_type;
 } ngx_http_lua_loc_conf_t;

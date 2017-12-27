@@ -89,8 +89,8 @@ struct ngx_cycle_s {
     ngx_str_t                 lock_file;
     ngx_str_t                 hostname;
 
-    ngx_log_intercept_pt      intercept_error_log_handler;
-    void                     *intercept_error_log_data;
+    ngx_log_intercept_pt      intercept_error_log_handler;          //error log的钩子回调
+    void                     *intercept_error_log_data;             //error log的钩子回调参数
     unsigned                  entered_logger;    /* :1 */
 };
 

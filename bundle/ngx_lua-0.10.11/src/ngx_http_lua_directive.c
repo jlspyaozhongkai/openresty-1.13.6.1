@@ -161,12 +161,13 @@ ngx_http_lua_code_cache(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     char             *p = conf;
     ngx_flag_t       *fp;
     char             *ret;
-
+    //还是调用了 通用的flag设置函数
     ret = ngx_conf_set_flag_slot(cf, cmd, conf);
     if (ret != NGX_CONF_OK) {
         return ret;
     }
 
+    //通过相同的offset再取得flag值，主要就是为了下边的告警
     fp = (ngx_flag_t *) (p + cmd->offset);
 
     if (!*fp) {
@@ -193,7 +194,7 @@ ngx_http_lua_package_cpath(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     value = cf->args->elts;
 
-    lmcf->lua_cpath.len = value[1].len;
+    lmcf->lua_cpath.len = value[1].len;         //只有一个参数
     lmcf->lua_cpath.data = value[1].data;
 
     return NGX_CONF_OK;
@@ -214,7 +215,7 @@ ngx_http_lua_package_path(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     value = cf->args->elts;
 
-    lmcf->lua_path.len = value[1].len;
+    lmcf->lua_path.len = value[1].len;          //只有一个参数
     lmcf->lua_path.data = value[1].data;
 
     return NGX_CONF_OK;
@@ -1701,7 +1702,7 @@ ngx_http_lua_conf_read_lua_token(ngx_conf_t *cf,
     return rc;
 }
 
-
+//lua_capture_error_log, 缓冲error信息，批量写入，提高效率
 char *
 ngx_http_lua_capture_error_log(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -1723,6 +1724,7 @@ ngx_http_lua_capture_error_log(ngx_conf_t *cf, ngx_command_t *cmd,
         return "is duplicate";
     }
 
+    //取得缓冲区的大小
     if (value[1].len == 0) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                            "invalid capture error log size \"%V\"",
@@ -1744,19 +1746,23 @@ ngx_http_lua_capture_error_log(ngx_conf_t *cf, ngx_command_t *cmd,
         return "capture error log handler has been hooked";
     }
 
+    //分配管理结构
     ringbuf = (ngx_http_lua_log_ringbuf_t *)
               ngx_palloc(cf->pool, sizeof(ngx_http_lua_log_ringbuf_t));
     if (ringbuf == NULL) {
         return NGX_CONF_ERROR;
     }
 
+    //分配了缓冲区数据块
     data = ngx_palloc(cf->pool, size);
     if (data == NULL) {
         return NGX_CONF_ERROR;
     }
 
+    //初始化
     ngx_http_lua_log_ringbuf_init(ringbuf, data, size);
 
+    //设置好error log的钩子
     lmcf->requires_capture_log = 1;
     cycle->intercept_error_log_handler = (ngx_log_intercept_pt)
                                          ngx_http_lua_capture_log_handler;

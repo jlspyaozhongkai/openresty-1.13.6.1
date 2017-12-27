@@ -73,28 +73,28 @@ static ngx_conf_bitmask_t  ngx_http_lua_ssl_protocols[] = {
 
 static ngx_command_t ngx_http_lua_cmds[] = {
 
-    { ngx_string("lua_max_running_timers"),
+    { ngx_string("lua_max_running_timers"),             //lua 定时器限制
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
       NGX_HTTP_MAIN_CONF_OFFSET,
       offsetof(ngx_http_lua_main_conf_t, max_running_timers),
       NULL },
 
-    { ngx_string("lua_max_pending_timers"),
+    { ngx_string("lua_max_pending_timers"),             //lua 定时器限制
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
       NGX_HTTP_MAIN_CONF_OFFSET,
       offsetof(ngx_http_lua_main_conf_t, max_pending_timers),
       NULL },
 
-    { ngx_string("lua_shared_dict"),
-      NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE2,
-      ngx_http_lua_shared_dict,
+    { ngx_string("lua_shared_dict"),                    //配置ngx lua 共享字典的命令
+      NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE2,                //两个参数：一个是名字，一个是尺寸
+      ngx_http_lua_shared_dict,                         //自己实现的配置解析
       0,
       0,
       NULL },
 
-    { ngx_string("lua_capture_error_log"),
+    { ngx_string("lua_capture_error_log"),              //缓冲error信息，批量写入，提高效率
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_capture_error_log,
       0,
@@ -102,14 +102,14 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       NULL },
 
 #if (NGX_PCRE)
-    { ngx_string("lua_regex_cache_max_entries"),
+    { ngx_string("lua_regex_cache_max_entries"),        //Nginx pcre 正则式缓存限制
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
       NGX_HTTP_MAIN_CONF_OFFSET,
       offsetof(ngx_http_lua_main_conf_t, regex_cache_max_entries),
       NULL },
 
-    { ngx_string("lua_regex_match_limit"),
+    { ngx_string("lua_regex_match_limit"),              //Nginx pcre 单次正则匹配上限
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
       NGX_HTTP_MAIN_CONF_OFFSET,
@@ -117,29 +117,29 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       NULL },
 #endif
 
-    { ngx_string("lua_package_cpath"),
+    { ngx_string("lua_package_cpath"),                              //C API动态库搜索路径
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_package_cpath,
       NGX_HTTP_MAIN_CONF_OFFSET,
       0,
       NULL },
 
-    { ngx_string("lua_package_path"),
+    { ngx_string("lua_package_path"),                               //Lua API动态库搜索路径
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_package_path,
       NGX_HTTP_MAIN_CONF_OFFSET,
       0,
       NULL },
 
-    { ngx_string("lua_code_cache"),
+    { ngx_string("lua_code_cache"),                                  //Lua 代码缓存开关，而且可以在多处使用
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_FLAG,
       ngx_http_lua_code_cache,
-      NGX_HTTP_LOC_CONF_OFFSET,
+      NGX_HTTP_LOC_CONF_OFFSET,                                     //这个是配置在location上的
       offsetof(ngx_http_lua_loc_conf_t, enable_code_cache),
       NULL },
 
-    { ngx_string("lua_need_request_body"),
+    { ngx_string("lua_need_request_body"),                          //类似于执行 ngx.req.read_body()，大body情况下回卡顿
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
@@ -147,7 +147,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, force_read_body),
       NULL },
 
-    { ngx_string("lua_transform_underscores_in_response_headers"),
+    { ngx_string("lua_transform_underscores_in_response_headers"),  //矫正Http头中不规范的下划线用的
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
@@ -155,7 +155,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, transform_underscores_in_resp_headers),
       NULL },
 
-     { ngx_string("lua_socket_log_errors"),
+     { ngx_string("lua_socket_log_errors"),                         //是否打开cosocket日志
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
@@ -606,11 +606,12 @@ ngx_http_module_t ngx_http_lua_module_ctx = {
 };
 
 
+//Nginx lua的模块
 ngx_module_t ngx_http_lua_module = {
     NGX_MODULE_V1,
-    &ngx_http_lua_module_ctx,   /*  module context */
-    ngx_http_lua_cmds,          /*  module directives */
-    NGX_HTTP_MODULE,            /*  module type */
+    &ngx_http_lua_module_ctx,   /*  module context */           //作为http module 都会有的结构
+    ngx_http_lua_cmds,          /*  module directives */        //有好多命令
+    NGX_HTTP_MODULE,            /*  module type */              //是一个http module
     NULL,                       /*  init master */
     NULL,                       /*  init module */
     ngx_http_lua_init_worker,   /*  init process */

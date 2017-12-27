@@ -5,7 +5,7 @@
 
 #include "ngx_http_lua_common.h"
 
-
+//Nginx lua 有缓冲error log功能（降低写磁盘的阻塞），这个就是缓冲区的管理结构
 typedef struct {
     ngx_uint_t   filter_level;
     char        *tail;              /* writed point */

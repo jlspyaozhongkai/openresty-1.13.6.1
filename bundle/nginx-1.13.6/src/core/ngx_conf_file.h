@@ -75,12 +75,12 @@
 
 
 struct ngx_command_s {
-    ngx_str_t             name;
-    ngx_uint_t            type;
-    char               *(*set)(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
-    ngx_uint_t            conf;
-    ngx_uint_t            offset;
-    void                 *post;
+    ngx_str_t             name;                 //命令的名字
+    ngx_uint_t            type;                 //命令的各种选项
+    char               *(*set)(ngx_conf_t *cf, ngx_command_t *cmd, void *conf); //回调，命令由谁处理
+    ngx_uint_t            conf;                 //main,serv,loc 哪一个
+    ngx_uint_t            offset;               //回调的参数，如果是通用的回调用于指示偏移，自定义回到直接填0的也有很多
+    void                 *post;                 //可能
 };
 
 #define ngx_null_command  { ngx_null_string, 0, NULL, 0, 0, NULL }
