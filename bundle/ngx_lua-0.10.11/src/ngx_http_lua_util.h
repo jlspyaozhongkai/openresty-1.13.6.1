@@ -342,9 +342,9 @@ ngx_http_lua_get_req(lua_State *L)
 {
     ngx_http_request_t    *r;
 
-    lua_getglobal(L, ngx_http_lua_req_key);
-    r = lua_touserdata(L, -1);
-    lua_pop(L, 1);
+    lua_getglobal(L, ngx_http_lua_req_key);     //从全局变量__ngx_req中取值，会保存到-1
+    r = lua_touserdata(L, -1);                  //转换成userdata 指针
+    lua_pop(L, 1);                              //pop掉，没用了
 
     return r;
 }

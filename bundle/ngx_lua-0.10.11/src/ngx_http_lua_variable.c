@@ -23,16 +23,19 @@ void
 ngx_http_lua_inject_variable_api(lua_State *L)
 {
     /* {{{ register reference maps */
+    //当前的nginx对象在索引-1，要注意
+    //给ngx对象设置一个var，var 是一个table，现在-2是
     lua_newtable(L);    /* ngx.var */
 
-    lua_createtable(L, 0, 2 /* nrec */); /* metatable for .var */
-    lua_pushcfunction(L, ngx_http_lua_var_get);
-    lua_setfield(L, -2, "__index");
-    lua_pushcfunction(L, ngx_http_lua_var_set);
-    lua_setfield(L, -2, "__newindex");
-    lua_setmetatable(L, -2);
+	//再新建一个metatable
+    lua_createtable(L, 0, 2 /* nrec */); /* metatable for .var */   //元表在-1
+    lua_pushcfunction(L, ngx_http_lua_var_get);                     //c fun在-1，元表在-2
+    lua_setfield(L, -2, "__index");                                 //往-2元表里设置key，元表再次在-1
+    lua_pushcfunction(L, ngx_http_lua_var_set);                     //c fun在-1，元表在-2
+    lua_setfield(L, -2, "__newindex");                              //往-2元表里设置key，元表再次在-1
+    lua_setmetatable(L, -2);                                        //往-2的var表里设置元表
 
-    lua_setfield(L, -2, "var");
+    lua_setfield(L, -2, "var");                                     //往-1的ngx里设置var
 }
 
 
@@ -43,6 +46,7 @@ ngx_http_lua_inject_variable_api(lua_State *L)
  * to get content, and actual content string when found the specified variable.
  * @seealso ngx_http_lua_var_set
  * */
+//从Request中获取变量（通过ngx.var的__index）
 static int
 ngx_http_lua_var_get(lua_State *L)
 {
@@ -59,7 +63,7 @@ ngx_http_lua_var_get(lua_State *L)
     LUA_NUMBER                   index;
     int                         *cap;
 #endif
-
+    //首先获得State对应的请求，一个请求对应一个State
     r = ngx_http_lua_get_req(L);
     if (r == NULL) {
         return luaL_error(L, "no request object found");
@@ -69,6 +73,7 @@ ngx_http_lua_var_get(lua_State *L)
 
 #if (NGX_PCRE)
     if (lua_type(L, -1) == LUA_TNUMBER) {
+        //数字索引的nginx变量
         /* it is a regex capturing variable */
 
         index = lua_tonumber(L, -1);
@@ -104,26 +109,32 @@ ngx_http_lua_var_get(lua_State *L)
     }
 #endif
 
+    //必须是string，并且是最后一个参数-1
     if (lua_type(L, -1) != LUA_TSTRING) {
         return luaL_error(L, "bad variable name");
     }
 
+    //取得变量的名字和长度
     p = (u_char *) lua_tolstring(L, -1, &len);
 
+    //分配空间用户保存小写的变量名
     lowcase = lua_newuserdata(L, len);
 
+    //将p按照len长转到小写lowcase并且计算出hash做返回值
     hash = ngx_hash_strlow(lowcase, p, len);
 
+    //变成一个nginx字符串，有指针有长度的
     name.len = len;
     name.data = lowcase;
 
+    //调用nginx接口获得变量
     vv = ngx_http_get_variable(r, &name, hash);
 
     if (vv == NULL || vv->not_found) {
         lua_pushnil(L);
         return 1;
     }
-
+    //将返回的变量字符串push到调用栈-1，并返回
     lua_pushlstring(L, (const char *) vv->data, (size_t) vv->len);
     return 1;
 }
@@ -150,6 +161,7 @@ ngx_http_lua_var_set(lua_State *L)
     int                          value_type;
     const char                  *msg;
 
+    //请求结构
     r = ngx_http_lua_get_req(L);
     if (r == NULL) {
         return luaL_error(L, "no request object found");
@@ -161,6 +173,7 @@ ngx_http_lua_var_set(lua_State *L)
 
     /* we read the variable name */
 
+    //变量名在正数2，正数1是var本身，转换成nginx字符串
     if (lua_type(L, 2) != LUA_TSTRING) {
         return luaL_error(L, "bad variable name");
     }
@@ -176,13 +189,13 @@ ngx_http_lua_var_set(lua_State *L)
     name.data = lowcase;
 
     /* we read the variable new value */
-
+    //而值却保存在了3
     value_type = lua_type(L, 3);
     switch (value_type) {
     case LUA_TNUMBER:
     case LUA_TSTRING:
         p = (u_char *) luaL_checklstring(L, 3, &len);
-
+        //从请求的pool中分配内存用来保存变量的值
         val = ngx_palloc(r->pool, len);
         if (val == NULL) {
             return luaL_error(L, "memory allocation error");
@@ -194,7 +207,7 @@ ngx_http_lua_var_set(lua_State *L)
 
     case LUA_TNIL:
         /* undef the variable */
-
+        //nil 就是要清除变量
         val = NULL;
         len = 0;
 
@@ -207,16 +220,18 @@ ngx_http_lua_var_set(lua_State *L)
     }
 
     /* we fetch the variable itself */
-
+    //Core module config
     cmcf = ngx_http_get_module_main_conf(r, ngx_http_core_module);
-
+    //找变量，变量如果在location中声明，就会找不到
     v = ngx_hash_find(&cmcf->variables_hash, hash, name.data, name.len);
 
     if (v) {
+        //有只读变量，这个是不能去设置的
         if (!(v->flags & NGX_HTTP_VAR_CHANGEABLE)) {
             return luaL_error(L, "variable \"%s\" not changeable", lowcase);
         }
-
+        //变量有设置回调，那么执行他的回调
+        //那么，是不是可以设置一些带回调的变量，然后当做配置寄存器来使用
         if (v->set_handler) {
 
             dd("set variables with set_handler");
@@ -227,6 +242,7 @@ ngx_http_lua_var_set(lua_State *L)
             }
 
             if (value_type == LUA_TNIL) {
+                //清除
                 vv->valid = 0;
                 vv->not_found = 1;
                 vv->no_cacheable = 0;
@@ -234,6 +250,7 @@ ngx_http_lua_var_set(lua_State *L)
                 vv->len = 0;
 
             } else {
+                //设置
                 vv->valid = 1;
                 vv->not_found = 0;
                 vv->no_cacheable = 0;
@@ -247,6 +264,7 @@ ngx_http_lua_var_set(lua_State *L)
             return 0;
         }
 
+        //否则就是一个内存变量，直接修改内存
         if (v->flags & NGX_HTTP_VAR_INDEXED) {
             vv = &r->variables[v->index];
 
