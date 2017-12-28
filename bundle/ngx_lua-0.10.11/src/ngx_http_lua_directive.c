@@ -231,7 +231,7 @@ ngx_http_lua_package_path(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 #if defined(NDK) && NDK
-set_by_lua_block
+//set_by_lua_block 的命令处理回调
 char *
 ngx_http_lua_set_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -250,7 +250,7 @@ ngx_http_lua_set_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-//set_by_lua
+//set_by_lua 的命令处理回调
 char *
 ngx_http_lua_set_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -299,7 +299,7 @@ ngx_http_lua_set_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return ndk_set_var_multi_value_core(cf, &target, &value[3], &filter);
 }
 
-//set_by_lua_file
+//set_by_lua_file 的命令处理回调
 char *
 ngx_http_lua_set_by_lua_file(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -349,7 +349,7 @@ ngx_http_lua_set_by_lua_file(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return ndk_set_var_multi_value_core(cf, &target, &value[2], &filter);
 }
 
-
+//set_by_lua 和 set_by_lua_block 配置后运行时调用
 ngx_int_t
 ngx_http_lua_filter_set_by_lua_inline(ngx_http_request_t *r, ngx_str_t *val,
     ngx_http_variable_value_t *v, void *data)
@@ -383,7 +383,7 @@ ngx_http_lua_filter_set_by_lua_inline(ngx_http_request_t *r, ngx_str_t *val,
     return NGX_OK;
 }
 
-
+//set_by_lua_file 配置后运行时调用
 ngx_int_t
 ngx_http_lua_filter_set_by_lua_file(ngx_http_request_t *r, ngx_str_t *val,
     ngx_http_variable_value_t *v, void *data)
