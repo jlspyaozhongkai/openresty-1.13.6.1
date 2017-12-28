@@ -37,7 +37,7 @@ typedef struct {
     ngx_queue_t                   lru_queue;
 } ngx_http_lua_shdict_shctx_t;
 
-
+//共享字典的ctx
 typedef struct {
     ngx_http_lua_shdict_shctx_t  *sh;
     ngx_slab_pool_t              *shpool;
@@ -46,12 +46,12 @@ typedef struct {
     ngx_log_t                    *log;
 } ngx_http_lua_shdict_ctx_t;
 
-
+//Nginx lua 共享内存的ctx
 typedef struct {
     ngx_log_t                   *log;
     ngx_http_lua_main_conf_t    *lmcf;
     ngx_cycle_t                 *cycle;
-    ngx_shm_zone_t               zone;
+    ngx_shm_zone_t               zone;          //所对应Nginx共享内存的zone拷贝
 } ngx_http_lua_shm_zone_ctx_t;
 
 

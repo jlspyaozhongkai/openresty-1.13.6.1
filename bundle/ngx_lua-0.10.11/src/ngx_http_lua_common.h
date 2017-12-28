@@ -189,10 +189,10 @@ struct ngx_http_lua_main_conf_s {
 
 #endif
 
-    ngx_array_t         *shm_zones;  /* of ngx_shm_zone_t* */
+    ngx_array_t         *shm_zones;  /* of ngx_shm_zone_t* */           //保存 ngx_shm_zone_t 指针(所有 共享内存）
 
-    ngx_array_t         *shdict_zones; /* shm zones of "shdict" */
-
+    ngx_array_t         *shdict_zones; /* shm zones of "shdict" */      //保存 ngx_shm_zone_t 指针(只有 用于共享字典)
+                                                                        //注意shdict_zones中的ngx_shm_zone_t是shm_zones中的拷贝
     ngx_array_t         *preload_hooks; /* of ngx_http_lua_preload_hook_t */
 
     ngx_flag_t           postponed_to_rewrite_phase_end;
@@ -230,7 +230,7 @@ struct ngx_http_lua_main_conf_s {
     unsigned             requires_rewrite:1;
     unsigned             requires_access:1;
     unsigned             requires_log:1;
-    unsigned             requires_shm:1;
+    unsigned             requires_shm:1;                    //有共享内存的表示，配置nginx lua共享字典后会设置
     unsigned             requires_capture_log:1;            //lua_capture_error_log 执行过的标志
 };
 

@@ -69,6 +69,7 @@ enum {
     FOUND_SINGLE_QUOTED
 };
 
+//共享字典的配置处理
 char *
 ngx_http_lua_shared_dict(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -80,6 +81,7 @@ ngx_http_lua_shared_dict(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     ngx_http_lua_shdict_ctx_t  *ctx;
     ssize_t                     size;
 
+    //用来保存zone的数组，实际上是共享内存
     if (lmcf->shdict_zones == NULL) {
         lmcf->shdict_zones = ngx_palloc(cf->pool, sizeof(ngx_array_t));
         if (lmcf->shdict_zones == NULL) {
@@ -94,6 +96,7 @@ ngx_http_lua_shared_dict(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
     }
 
+    //命令参数处理
     value = cf->args->elts;
 
     ctx = NULL;
@@ -103,9 +106,9 @@ ngx_http_lua_shared_dict(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
                            "invalid lua shared dict name \"%V\"", &value[1]);
         return NGX_CONF_ERROR;
     }
-
+    //共享字典的名字
     name = value[1];
-
+    //共享字典的大小
     size = ngx_parse_size(&value[2]);
 
     if (size <= 8191) {
@@ -114,6 +117,7 @@ ngx_http_lua_shared_dict(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return NGX_CONF_ERROR;
     }
 
+    //给共享字典分配一个上下文环境
     ctx = ngx_pcalloc(cf->pool, sizeof(ngx_http_lua_shdict_ctx_t));
     if (ctx == NULL) {
         return NGX_CONF_ERROR;
@@ -123,12 +127,15 @@ ngx_http_lua_shared_dict(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     ctx->main_conf = lmcf;
     ctx->log = &cf->cycle->new_log;
 
+    //创建一个zone, 注意zone在lmcf->shdict_zones中保存，
+    //注意最后一个参数是表示用途的，使用自己结构的全局变量可以保证却别与其他模块
     zone = ngx_http_lua_shared_memory_add(cf, &name, (size_t) size,
                                           &ngx_http_lua_module);
     if (zone == NULL) {
         return NGX_CONF_ERROR;
     }
 
+    //共享内存的资源是否已经被占用
     if (zone->data) {
         ctx = zone->data;
 
@@ -138,9 +145,11 @@ ngx_http_lua_shared_dict(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return NGX_CONF_ERROR;
     }
 
+    //ctx 是zone的参数，这个用于共享字典的初始化
     zone->init = ngx_http_lua_shdict_init_zone;
     zone->data = ctx;
 
+    //保存到lmcf->shdict_zones
     zp = ngx_array_push(lmcf->shdict_zones);
     if (zp == NULL) {
         return NGX_CONF_ERROR;

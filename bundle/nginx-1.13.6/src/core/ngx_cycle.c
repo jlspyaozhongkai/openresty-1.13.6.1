@@ -1200,7 +1200,7 @@ ngx_reopen_files(ngx_cycle_t *cycle, ngx_uid_t user)
     (void) ngx_log_redirect_stderr(cycle);
 }
 
-
+//Nginx 的共享内存添加
 ngx_shm_zone_t *
 ngx_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size, void *tag)
 {
@@ -1211,6 +1211,7 @@ ngx_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size, void *tag)
     part = &cf->cycle->shared_memory.part;
     shm_zone = part->elts;
 
+    //这是在遍历链表
     for (i = 0; /* void */ ; i++) {
 
         if (i >= part->nelts) {
@@ -1222,6 +1223,7 @@ ngx_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size, void *tag)
             i = 0;
         }
 
+        //比对名字
         if (name->len != shm_zone[i].shm.name.len) {
             continue;
         }
@@ -1232,6 +1234,7 @@ ngx_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size, void *tag)
             continue;
         }
 
+        //比对tag， tag 不一样就是和别的模块重名冲突的
         if (tag != shm_zone[i].tag) {
             ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
                             "the shared memory zone \"%V\" is "
@@ -1240,6 +1243,7 @@ ngx_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size, void *tag)
             return NULL;
         }
 
+        //没冲突的就继续，矫正和检查size
         if (shm_zone[i].shm.size == 0) {
             shm_zone[i].shm.size = size;
         }
@@ -1255,12 +1259,14 @@ ngx_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size, void *tag)
         return &shm_zone[i];
     }
 
+    //没找到就重新创建一个
     shm_zone = ngx_list_push(&cf->cycle->shared_memory);
 
     if (shm_zone == NULL) {
         return NULL;
     }
 
+    //配置共享内存并返回，其中 init和data必须为空，name，tag，size必须被设置
     shm_zone->data = NULL;
     shm_zone->shm.log = cf->cycle->log;
     shm_zone->shm.size = size;

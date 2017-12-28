@@ -34,10 +34,11 @@ typedef ngx_int_t (*ngx_shm_zone_init_pt) (ngx_shm_zone_t *zone, void *data);
 typedef ngx_int_t (*ngx_log_intercept_pt) (ngx_log_t *log, ngx_uint_t level,
     u_char *buf, size_t len);
 
+//Nginx的共享内存
 struct ngx_shm_zone_s {
-    void                     *data;
+    void                     *data;             //是下边init的参数，是一个ctx
     ngx_shm_t                 shm;
-    ngx_shm_zone_init_pt      init;
+    ngx_shm_zone_init_pt      init;             //zone的初始化回调，data 是参数
     void                     *tag;
     ngx_uint_t                noreuse;  /* unsigned  noreuse:1; */
 };
@@ -71,7 +72,7 @@ struct ngx_cycle_s {
     ngx_rbtree_node_t         config_dump_sentinel;
 
     ngx_list_t                open_files;
-    ngx_list_t                shared_memory;
+    ngx_list_t                shared_memory;                //Nginx 共享内存
 
     ngx_uint_t                connection_n;
     ngx_uint_t                files_n;

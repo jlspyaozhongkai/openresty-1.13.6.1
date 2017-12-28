@@ -82,7 +82,7 @@ ngx_http_lua_add_package_preload(ngx_conf_t *cf, const char *package,
     return NGX_OK;
 }
 
-
+//由配置指令导致 创建共享
 ngx_shm_zone_t *
 ngx_http_lua_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size,
     void *tag)
@@ -98,6 +98,7 @@ ngx_http_lua_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size,
         return NULL;
     }
 
+    //保存共享内存的数组
     if (lmcf->shm_zones == NULL) {
         lmcf->shm_zones = ngx_palloc(cf->pool, sizeof(ngx_array_t));
         if (lmcf->shm_zones == NULL) {
@@ -112,16 +113,19 @@ ngx_http_lua_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size,
         }
     }
 
+    //添加共享内存，如果之前创建过就讲之前的创建返回
     zone = ngx_shared_memory_add(cf, name, (size_t) size, tag);
     if (zone == NULL) {
         return NULL;
     }
 
+    //新zone的data必须是NULL的
     if (zone->data) {
         ctx = (ngx_http_lua_shm_zone_ctx_t *) zone->data;
         return &ctx->zone;
     }
 
+    //新建一个Nginx lua 共享内存ctx给新zone
     n = sizeof(ngx_http_lua_shm_zone_ctx_t);
 
     ctx = ngx_pcalloc(cf->pool, n);
@@ -135,6 +139,7 @@ ngx_http_lua_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size,
 
     ngx_memcpy(&ctx->zone, zone, sizeof(ngx_shm_zone_t));
 
+    //所有的Nginx lua 共享内存被保存
     zp = ngx_array_push(lmcf->shm_zones);
     if (zp == NULL) {
         return NULL;
@@ -142,12 +147,15 @@ ngx_http_lua_shared_memory_add(ngx_conf_t *cf, ngx_str_t *name, size_t size,
 
     *zp = zone;
 
+    //Nginx lua 共享内存初始化，注意这个初始化是配给Nginx lua共享内存的
+    //Nginx lua 共享内存ctx中的zone拷贝没有被设置初始化
     /* set zone init */
     zone->init = ngx_http_lua_shared_memory_init;
     zone->data = ctx;
 
     lmcf->requires_shm = 1;
 
+    //这里比较别扭，返回的是Nginx lua共享内存ctx中zone拷贝的地址
     return &ctx->zone;
 }
 
