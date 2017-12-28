@@ -69,7 +69,6 @@ enum {
     FOUND_SINGLE_QUOTED
 };
 
-
 char *
 ngx_http_lua_shared_dict(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
