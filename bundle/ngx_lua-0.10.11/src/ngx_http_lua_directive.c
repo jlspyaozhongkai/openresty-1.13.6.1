@@ -231,6 +231,7 @@ ngx_http_lua_package_path(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
 
 #if defined(NDK) && NDK
+set_by_lua_block
 char *
 ngx_http_lua_set_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -249,7 +250,7 @@ ngx_http_lua_set_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//set_by_lua
 char *
 ngx_http_lua_set_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -298,7 +299,7 @@ ngx_http_lua_set_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return ndk_set_var_multi_value_core(cf, &target, &value[3], &filter);
 }
 
-
+//set_by_lua_file
 char *
 ngx_http_lua_set_by_lua_file(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -1091,7 +1092,7 @@ ngx_http_lua_body_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     return NGX_CONF_OK;
 }
 
-
+//init_by_lua_block 的命令回调(块配置)
 char *
 ngx_http_lua_init_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -1100,9 +1101,9 @@ ngx_http_lua_init_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     ngx_conf_t   save;
 
     save = *cf;
-    cf->handler = ngx_http_lua_init_by_lua;
+    cf->handler = ngx_http_lua_init_by_lua;         //虽说是block，但最终也是一段脚本
     cf->handler_conf = conf;
-
+    //Nginx lua里有很多这样的块，统一用一个函数解析
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -1110,7 +1111,9 @@ ngx_http_lua_init_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//init_by_lua     (pos:ngx_http_lua_init_by_inline)
+//init_by_lua_file(pos:ngx_http_lua_init_by_file)
+//都使用这个命令回调
 char *
 ngx_http_lua_init_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -1122,11 +1125,11 @@ ngx_http_lua_init_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     dd("enter");
 
     /*  must specify a content handler */
-    if (cmd->post == NULL) {
+    if (cmd->post == NULL) {        //检查 尾处理
         return NGX_CONF_ERROR;
     }
 
-    if (lmcf->init_handler) {
+    if (lmcf->init_handler) {       //几种不同的配置法，但是最多只能有一个。
         return "is duplicate";
     }
 
@@ -1139,9 +1142,11 @@ ngx_http_lua_init_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         return NGX_CONF_ERROR;
     }
 
+    //设定回调
     lmcf->init_handler = (ngx_http_lua_main_conf_handler_pt) cmd->post;
 
     if (cmd->post == ngx_http_lua_init_by_file) {
+        //如果是init_by_lua_file，拿到的就是一个路径，路径要进行rebase，替换$prefix
         name = ngx_http_lua_rebase_path(cf->pool, value[1].data,
                                         value[1].len);
         if (name == NULL) {
@@ -1152,13 +1157,14 @@ ngx_http_lua_init_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         lmcf->init_src.len = ngx_strlen(name);
 
     } else {
+        //如果是init_by_lua，就直接使用字符串
         lmcf->init_src = value[1];
     }
 
     return NGX_CONF_OK;
 }
 
-
+//init_worker_by_lua_block 命令回调
 char *
 ngx_http_lua_init_worker_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -1167,7 +1173,7 @@ ngx_http_lua_init_worker_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     ngx_conf_t   save;
 
     save = *cf;
-    cf->handler = ngx_http_lua_init_worker_by_lua;
+    cf->handler = ngx_http_lua_init_worker_by_lua;  //最终还是一段脚本，解析玩block转init_worker_by_lua
     cf->handler_conf = conf;
 
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
@@ -1177,7 +1183,8 @@ ngx_http_lua_init_worker_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//init_worker_by_lua     (post:ngx_http_lua_init_worker_by_inline)
+//init_worker_by_lua_file(post:ngx_http_lua_init_worker_by_file)
 char *
 ngx_http_lua_init_worker_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -1295,7 +1302,7 @@ found:
     return out;
 }
 
-
+//将 by_lua_block 里边的东西转换成lua基本，作为buffer。
 /* a specialized version of the standard ngx_conf_parse() function */
 char *
 ngx_http_lua_conf_lua_block_parse(ngx_conf_t *cf, ngx_command_t *cmd)

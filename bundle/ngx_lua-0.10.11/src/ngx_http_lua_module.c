@@ -163,42 +163,42 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, log_socket_errors),
       NULL },
 
-    { ngx_string("init_by_lua_block"),
-      NGX_HTTP_MAIN_CONF|NGX_CONF_BLOCK|NGX_CONF_NOARGS,
+    { ngx_string("init_by_lua_block"),                              //master 初始化
+      NGX_HTTP_MAIN_CONF|NGX_CONF_BLOCK|NGX_CONF_NOARGS,            //配置块
       ngx_http_lua_init_by_lua_block,
       NGX_HTTP_MAIN_CONF_OFFSET,
       0,
-      (void *) ngx_http_lua_init_by_inline },
+      (void *) ngx_http_lua_init_by_inline },                       //运行的时候从buffer加载
 
-    { ngx_string("init_by_lua"),
-      NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
+    { ngx_string("init_by_lua"),                                    //master 初始化
+      NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,                            //字符串配置
       ngx_http_lua_init_by_lua,
       NGX_HTTP_MAIN_CONF_OFFSET,
       0,
-      (void *) ngx_http_lua_init_by_inline },
+      (void *) ngx_http_lua_init_by_inline },                       //运行的时候从buffer加载
 
-    { ngx_string("init_by_lua_file"),
-      NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
+    { ngx_string("init_by_lua_file"),                               //master 初始化
+      NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,                            //字符串配置
       ngx_http_lua_init_by_lua,
       NGX_HTTP_MAIN_CONF_OFFSET,
       0,
-      (void *) ngx_http_lua_init_by_file },
+      (void *) ngx_http_lua_init_by_file },                          //运行的时候从文件加载
 
-    { ngx_string("init_worker_by_lua_block"),
+    { ngx_string("init_worker_by_lua_block"),                       //worker 初始化
       NGX_HTTP_MAIN_CONF|NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_lua_init_worker_by_lua_block,
       NGX_HTTP_MAIN_CONF_OFFSET,
       0,
       (void *) ngx_http_lua_init_worker_by_inline },
 
-    { ngx_string("init_worker_by_lua"),
+    { ngx_string("init_worker_by_lua"),                             //worker 初始化
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_init_worker_by_lua,
       NGX_HTTP_MAIN_CONF_OFFSET,
       0,
       (void *) ngx_http_lua_init_worker_by_inline },
 
-    { ngx_string("init_worker_by_lua_file"),
+    { ngx_string("init_worker_by_lua_file"),                        //worker 初始化
       NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_init_worker_by_lua,
       NGX_HTTP_MAIN_CONF_OFFSET,
@@ -209,7 +209,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
     /* set_by_lua $res { inline Lua code } [$arg1 [$arg2 [...]]] */
     { ngx_string("set_by_lua_block"),
       NGX_HTTP_SRV_CONF|NGX_HTTP_SIF_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
-                       |NGX_CONF_1MORE|NGX_CONF_BLOCK,
+                       |NGX_CONF_1MORE|NGX_CONF_BLOCK,              //server和里边的if，location和里边的if
       ngx_http_lua_set_by_lua_block,
       NGX_HTTP_LOC_CONF_OFFSET,
       0,

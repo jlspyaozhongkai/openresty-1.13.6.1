@@ -368,7 +368,7 @@ ngx_http_lua_del_thread(ngx_http_request_t *r, lua_State *L,
     lua_pop(L, 1);
 }
 
-
+//路径rebase
 u_char *
 ngx_http_lua_rebase_path(ngx_pool_t *pool, u_char *src, size_t len)
 {

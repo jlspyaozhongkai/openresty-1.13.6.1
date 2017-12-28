@@ -198,11 +198,11 @@ struct ngx_http_lua_main_conf_s {
     ngx_flag_t           postponed_to_rewrite_phase_end;
     ngx_flag_t           postponed_to_access_phase_end;
 
-    ngx_http_lua_main_conf_handler_pt    init_handler;
-    ngx_str_t                            init_src;
+    ngx_http_lua_main_conf_handler_pt    init_handler;                  //init_by_lua_xxx 的调用入口
+    ngx_str_t                            init_src;                      //init_by_lua_xxx 的入口参数，脚本内容或者脚本文件路径
 
-    ngx_http_lua_main_conf_handler_pt    init_worker_handler;
-    ngx_str_t                            init_worker_src;
+    ngx_http_lua_main_conf_handler_pt    init_worker_handler;           //init_worker_by_lua_xxx 的调用入口
+    ngx_str_t                            init_worker_src;               //init_worker_by_lua_xxx 的入口参数，脚本内容或者脚本文件路径
 
     ngx_http_lua_balancer_peer_data_t      *balancer_peer_data;
                     /* balancer_by_lua does not support yielding and

@@ -291,7 +291,7 @@ failed:
     return NGX_ERROR;
 }
 
-
+//init_worker_by_lua 和 init_worker_by_lua_block 配置后运行时调用
 ngx_int_t
 ngx_http_lua_init_worker_by_inline(ngx_log_t *log,
     ngx_http_lua_main_conf_t *lmcf, lua_State *L)
@@ -305,7 +305,7 @@ ngx_http_lua_init_worker_by_inline(ngx_log_t *log,
     return ngx_http_lua_report(log, L, status, "init_worker_by_lua");
 }
 
-
+//init_worker_by_file 配置后运行时调用
 ngx_int_t
 ngx_http_lua_init_worker_by_file(ngx_log_t *log, ngx_http_lua_main_conf_t *lmcf,
     lua_State *L)
