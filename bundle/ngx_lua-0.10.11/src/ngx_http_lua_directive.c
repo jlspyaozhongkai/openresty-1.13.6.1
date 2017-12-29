@@ -243,6 +243,7 @@ ngx_http_lua_set_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     cf->handler = ngx_http_lua_set_by_lua;
     cf->handler_conf = conf;
 
+	//block方式最终也还是一段脚本，所以使用ngx_http_lua_set_by_lua在解析完block以后处理
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -261,6 +262,7 @@ ngx_http_lua_set_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     ngx_http_lua_set_var_data_t     *filter_data;
 
+	//分析输入
     /*
      * value[0] = "set_by_lua"
      * value[1] = target variable name
@@ -270,10 +272,12 @@ ngx_http_lua_set_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     value = cf->args->elts;
     target = value[1];
 
+	//这个filter是NDK定义的ndk_set_var_t
     filter.type = NDK_SET_VAR_MULTI_VALUE_DATA;
-    filter.func = cmd->post;
+    filter.func = cmd->post;												//ngx_http_lua_filter_set_by_lua_inline
     filter.size = cf->args->nelts - 3;    /*  get number of real params */
 
+	//NDK回调的详情
     filter_data = ngx_palloc(cf->pool, sizeof(ngx_http_lua_set_var_data_t));
     if (filter_data == NULL) {
         return NGX_CONF_ERROR;
@@ -296,6 +300,7 @@ ngx_http_lua_set_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     filter.data = filter_data;
 
+	//参数应该是自己没保存，NDK set var 代管了
     return ndk_set_var_multi_value_core(cf, &target, &value[3], &filter);
 }
 
@@ -310,6 +315,7 @@ ngx_http_lua_set_by_lua_file(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     ngx_http_lua_set_var_data_t     *filter_data;
 
+	//分析输入
     /*
      * value[0] = "set_by_lua_file"
      * value[1] = target variable name
@@ -319,11 +325,13 @@ ngx_http_lua_set_by_lua_file(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     value = cf->args->elts;
     target = value[1];
 
+	//设置Ndk 的ndk_set_var_t
     filter.type = NDK_SET_VAR_MULTI_VALUE_DATA;
-    filter.func = cmd->post;
+    filter.func = cmd->post;							//ngx_http_lua_filter_set_by_lua_file
     filter.size = cf->args->nelts - 2;    /*  get number of real params and
                                               lua script */
 
+	//ngx_http_lua_filter_set_by_lua_file 的参数
     filter_data = ngx_palloc(cf->pool, sizeof(ngx_http_lua_set_var_data_t));
     if (filter_data == NULL) {
         return NGX_CONF_ERROR;
@@ -342,10 +350,12 @@ ngx_http_lua_set_by_lua_file(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     p = ngx_http_lua_digest_hex(p, value[2].data, value[2].len);
     *p = '\0';
 
+	//这里的脚本时空的，所以将脚本路径放当做第一个参数放起来了
     ngx_str_null(&filter_data->script);
 
     filter.data = filter_data;
 
+	//Ndk 代管
     return ndk_set_var_multi_value_core(cf, &target, &value[2], &filter);
 }
 
@@ -435,7 +445,7 @@ ngx_http_lua_filter_set_by_lua_file(ngx_http_request_t *r, ngx_str_t *val,
 }
 #endif /* defined(NDK) && NDK */
 
-
+//rewrite_by_lua_block 命令回调
 char *
 ngx_http_lua_rewrite_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -447,6 +457,7 @@ ngx_http_lua_rewrite_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     cf->handler = ngx_http_lua_rewrite_by_lua;
     cf->handler_conf = conf;
 
+	//从block中提取脚本以后，再调用ngx_http_lua_rewrite_by_lua 归一处理
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -454,7 +465,9 @@ ngx_http_lua_rewrite_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//rewrite_by_lua 	 (post:ngx_http_lua_rewrite_handler_inline)
+//rewrite_by_lua_file(post:ngx_http_lua_rewrite_handler_file)
+//命令处理
 char *
 ngx_http_lua_rewrite_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {

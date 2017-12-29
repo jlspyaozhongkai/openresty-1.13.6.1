@@ -13,11 +13,12 @@ typedef ngx_int_t   (*ndk_set_var_value_data_pt)   (ngx_http_request_t *r, ngx_s
 typedef void        (*ndk_set_var_hash_pt)         (u_char *p, char *data, size_t len);
 
 
+//NDK 定义的设置变量结构
 typedef struct {
-    ngx_uint_t      type;
-    void           *func;
-    size_t          size;
-    void           *data;
+    ngx_uint_t      type;						//设置的类型
+    void           *func;						//设置用的回调
+    size_t          size;						//参数的数量？
+    void           *data;						//func 的参数
 } ndk_set_var_t;
 
 

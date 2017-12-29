@@ -163,6 +163,7 @@ ngx_http_lua_rewrite_handler(ngx_http_request_t *r)
 }
 
 
+//rewrite_by_lua_block 或者 rewrite_by_lua 配置后，运行时回调
 ngx_int_t
 ngx_http_lua_rewrite_handler_inline(ngx_http_request_t *r)
 {
@@ -189,7 +190,7 @@ ngx_http_lua_rewrite_handler_inline(ngx_http_request_t *r)
     return ngx_http_lua_rewrite_by_chunk(L, r);
 }
 
-
+//rewrite_by_lua_file 配置后，运行时回调
 ngx_int_t
 ngx_http_lua_rewrite_handler_file(ngx_http_request_t *r)
 {
