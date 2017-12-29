@@ -255,7 +255,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_rewrite_handler_inline },
 
     /* access_by_lua "<inline script>" */
-    { ngx_string("access_by_lua"),
+    { ngx_string("access_by_lua"),                                  //
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_access_by_lua,

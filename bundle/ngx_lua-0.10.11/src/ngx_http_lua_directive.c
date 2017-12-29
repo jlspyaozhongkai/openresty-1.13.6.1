@@ -493,6 +493,7 @@ ngx_http_lua_rewrite_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return "is duplicate";
     }
 
+    //参数处理
     value = cf->args->elts;
 
     if (value[1].len == 0) {
@@ -504,16 +505,17 @@ ngx_http_lua_rewrite_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     if (cmd->post == ngx_http_lua_rewrite_handler_inline) {
+        //代码型，rewrite_by_lua 是
         chunkname = ngx_http_lua_gen_chunk_name(cf, "rewrite_by_lua",
                                                 sizeof("rewrite_by_lua") - 1);
         if (chunkname == NULL) {
             return NGX_CONF_ERROR;
         }
-
+        //chunkname 是做什么用的就不知道了
         llcf->rewrite_chunkname = chunkname;
 
         /* Don't eval nginx variables for inline lua code */
-
+        //设置到rewrite_src作为回调
         llcf->rewrite_src.value = value[1];
 
         p = ngx_palloc(cf->pool, NGX_HTTP_LUA_INLINE_KEY_LEN + 1);
@@ -528,10 +530,11 @@ ngx_http_lua_rewrite_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         *p = '\0';
 
     } else {
+        //by 文件
         ngx_memzero(&ccv, sizeof(ngx_http_compile_complex_value_t));
         ccv.cf = cf;
-        ccv.value = &value[1];
-        ccv.complex_value = &llcf->rewrite_src;
+        ccv.value = &value[1];                      //输入
+        ccv.complex_value = &llcf->rewrite_src;     //输出
 
         if (ngx_http_compile_complex_value(&ccv) != NGX_OK) {
             return NGX_CONF_ERROR;
@@ -552,8 +555,10 @@ ngx_http_lua_rewrite_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
     }
 
+    //设置回调
     llcf->rewrite_handler = (ngx_http_handler_pt) cmd->post;
 
+    //lua module config
     lmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_lua_module);
 
     lmcf->requires_rewrite = 1;

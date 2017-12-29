@@ -228,7 +228,7 @@ struct ngx_http_lua_main_conf_s {
     unsigned             requires_header_filter:1;
     unsigned             requires_body_filter:1;
     unsigned             requires_capture_filter:1;
-    unsigned             requires_rewrite:1;
+    unsigned             requires_rewrite:1;                //有rewrite
     unsigned             requires_access:1;
     unsigned             requires_log:1;
     unsigned             requires_shm:1;                    //有共享内存的表示，配置nginx lua共享字典后会设置
@@ -278,7 +278,7 @@ typedef struct {
 
     ngx_flag_t              http10_buffering;
 
-    ngx_http_handler_pt     rewrite_handler;
+    ngx_http_handler_pt     rewrite_handler;                                                //rewrite执行回调
     ngx_http_handler_pt     access_handler;
     ngx_http_handler_pt     content_handler;
     ngx_http_handler_pt     log_handler;
@@ -287,11 +287,10 @@ typedef struct {
     ngx_http_output_body_filter_pt         body_filter_handler;
 
     u_char                  *rewrite_chunkname;
-    ngx_http_complex_value_t rewrite_src;    /*  rewrite_by_lua
-                                                inline script/script
-                                                file path */
+    ngx_http_complex_value_t rewrite_src;           //rewrite 的回调参数，里边是脚本或者路径
+                                                /*  rewrite_by_lua inline script/script file path */
 
-    u_char                  *rewrite_src_key; /* cached key for rewrite_src */
+    u_char                  *rewrite_src_key; /* cached key for rewrite_src */  //rewrite_src算得的key
 
     u_char                  *access_chunkname;
     ngx_http_complex_value_t access_src;     /*  access_by_lua
