@@ -206,8 +206,9 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_init_worker_by_file },
 
 #if defined(NDK) && NDK
+	//变量功能是依靠Nginx NDK来实现的，另外set 发生在rewrite之前
     /* set_by_lua $res { inline Lua code } [$arg1 [$arg2 [...]]] */
-    { ngx_string("set_by_lua_block"),
+    { ngx_string("set_by_lua_block"),								//设置变量
       NGX_HTTP_SRV_CONF|NGX_HTTP_SIF_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                        |NGX_CONF_1MORE|NGX_CONF_BLOCK,              //server和里边的if，location和里边的if
       ngx_http_lua_set_by_lua_block,
@@ -216,7 +217,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_filter_set_by_lua_inline },
 
     /* set_by_lua $res <inline script> [$arg1 [$arg2 [...]]] */
-    { ngx_string("set_by_lua"),
+    { ngx_string("set_by_lua"),										//设置变量
       NGX_HTTP_SRV_CONF|NGX_HTTP_SIF_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                        |NGX_CONF_2MORE,                             //两个以上参数
       ngx_http_lua_set_by_lua,
@@ -225,7 +226,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_filter_set_by_lua_inline },
 
     /* set_by_lua_file $res rel/or/abs/path/to/script [$arg1 [$arg2 [..]]] */
-    { ngx_string("set_by_lua_file"),
+    { ngx_string("set_by_lua_file"),								//设置变量
       NGX_HTTP_SRV_CONF|NGX_HTTP_SIF_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                        |NGX_CONF_2MORE,                             //两个以上参数
       ngx_http_lua_set_by_lua_file,
@@ -234,8 +235,9 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_filter_set_by_lua_file },
 #endif
 
+	//Set 最早随后是rewrite，反正是很早，资源不是很充足
     /* rewrite_by_lua "<inline script>" */
-    { ngx_string("rewrite_by_lua"),
+    { ngx_string("rewrite_by_lua"),									//rewrite
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_rewrite_by_lua,
@@ -244,7 +246,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_rewrite_handler_inline },
 
     /* rewrite_by_lua_block { <inline script> } */
-    { ngx_string("rewrite_by_lua_block"),
+    { ngx_string("rewrite_by_lua_block"),							//rewrite
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_lua_rewrite_by_lua_block,
@@ -304,7 +306,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       0,
       (void *) ngx_http_lua_log_handler_inline },
 
-    { ngx_string("rewrite_by_lua_file"),
+    { ngx_string("rewrite_by_lua_file"),							//rewrite 的byfile居然隔这么远
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_rewrite_by_lua,
@@ -312,7 +314,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       0,
       (void *) ngx_http_lua_rewrite_handler_file },
 
-    { ngx_string("rewrite_by_lua_no_postpone"),
+    { ngx_string("rewrite_by_lua_no_postpone"),						//rewrite的一个选项，默认的off会导致by lua 在rewrite阶段的最后一个执行（默认推迟）
       NGX_HTTP_MAIN_CONF|NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
       NGX_HTTP_MAIN_CONF_OFFSET,

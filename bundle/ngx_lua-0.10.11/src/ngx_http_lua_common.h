@@ -97,10 +97,11 @@
 
 
 #if defined(NDK) && NDK
+//NDK 设置变量 Nginx lua 回调的参数
 typedef struct {
-    size_t       size;
-    u_char      *key;
-    ngx_str_t    script;
+    size_t       size;				//参数的数量
+    u_char      *key;				//针对脚本算得的key
+    ngx_str_t    script;			//回调的脚本
 } ngx_http_lua_set_var_data_t;
 #endif
 
@@ -195,7 +196,7 @@ struct ngx_http_lua_main_conf_s {
                                                                         //注意shdict_zones中的ngx_shm_zone_t是shm_zones中的拷贝
     ngx_array_t         *preload_hooks; /* of ngx_http_lua_preload_hook_t */
 
-    ngx_flag_t           postponed_to_rewrite_phase_end;
+    ngx_flag_t           postponed_to_rewrite_phase_end;				//rewrite是否被在所有的rewrite中最后执行，默认是off，最后一个执行
     ngx_flag_t           postponed_to_access_phase_end;
 
     ngx_http_lua_main_conf_handler_pt    init_handler;                  //init_by_lua_xxx 的调用入口
