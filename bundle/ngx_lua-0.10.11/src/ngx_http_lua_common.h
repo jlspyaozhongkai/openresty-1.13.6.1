@@ -227,10 +227,10 @@ struct ngx_http_lua_main_conf_s {
 
     unsigned             requires_header_filter:1;
     unsigned             requires_body_filter:1;
-    unsigned             requires_capture_filter:1;
+    unsigned             requires_capture_filter:1;         //access 和 content 会设置
     unsigned             requires_rewrite:1;                //有rewrite
-    unsigned             requires_access:1;
-    unsigned             requires_log:1;
+    unsigned             requires_access:1;                 //有access by lua
+    unsigned             requires_log:1;                    //有log by lua
     unsigned             requires_shm:1;                    //有共享内存的表示，配置nginx lua共享字典后会设置
     unsigned             requires_capture_log:1;            //lua_capture_error_log 执行过的标志
 };
@@ -279,39 +279,37 @@ typedef struct {
     ngx_flag_t              http10_buffering;
 
     ngx_http_handler_pt     rewrite_handler;                                                //rewrite执行回调
-    ngx_http_handler_pt     access_handler;
-    ngx_http_handler_pt     content_handler;
-    ngx_http_handler_pt     log_handler;
+    ngx_http_handler_pt     access_handler;                                                 //access执行回调
+    ngx_http_handler_pt     content_handler;                                                //content执行回调
+    ngx_http_handler_pt     log_handler;                                                    //log 执行回调
     ngx_http_handler_pt     header_filter_handler;
 
     ngx_http_output_body_filter_pt         body_filter_handler;
 
-    u_char                  *rewrite_chunkname;
+    u_char                  *rewrite_chunkname;     //
     ngx_http_complex_value_t rewrite_src;           //rewrite 的回调参数，里边是脚本或者路径
                                                 /*  rewrite_by_lua inline script/script file path */
 
     u_char                  *rewrite_src_key; /* cached key for rewrite_src */  //rewrite_src算得的key
 
-    u_char                  *access_chunkname;
-    ngx_http_complex_value_t access_src;     /*  access_by_lua
-                                                inline script/script
-                                                file path */
+    u_char                  *access_chunkname;     //
+    ngx_http_complex_value_t access_src;           //access 的回调参数，里边是脚本或者路径
+                                                   /*  access_by_lua inline script/script file path */
 
-    u_char                  *access_src_key; /* cached key for access_src */
+    u_char                  *access_src_key; /* cached key for access_src */     //access_src算得的key
 
-    u_char                  *content_chunkname;
-    ngx_http_complex_value_t content_src;    /*  content_by_lua
-                                                inline script/script
-                                                file path */
+    u_char                  *content_chunkname;    //
+    ngx_http_complex_value_t content_src;          //content 的回调参数，里边是脚本或者路径
+                                                   /*  content_by_lua inline script/script file path */
 
-    u_char                 *content_src_key; /* cached key for content_src */
+    u_char                 *content_src_key; /* cached key for content_src */    //content_src 算得的key
 
 
     u_char                      *log_chunkname;
-    ngx_http_complex_value_t     log_src;     /* log_by_lua inline script/script
-                                                 file path */
+    ngx_http_complex_value_t     log_src;         //log by lua 的回调参数，里边是脚本或者路径
+                                                  /* log_by_lua inline script/script file path */
 
-    u_char                      *log_src_key; /* cached key for log_src */
+    u_char                      *log_src_key; /* cached key for log_src */       //log_src 算得的key
 
     ngx_http_complex_value_t header_filter_src;  /*  header_filter_by_lua
                                                      inline script/script

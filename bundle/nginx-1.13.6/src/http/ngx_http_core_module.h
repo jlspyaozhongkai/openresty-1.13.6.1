@@ -326,7 +326,7 @@ struct ngx_http_core_loc_conf_s {
     uint32_t      limit_except;
     void        **limit_except_loc_conf;
 
-    ngx_http_handler_pt  handler;
+    ngx_http_handler_pt  handler;                   //content by lua 时会设置 ngx_http_lua_content_handler
 
     /* location name length for inclusive location with inherited alias */
     size_t        alias;

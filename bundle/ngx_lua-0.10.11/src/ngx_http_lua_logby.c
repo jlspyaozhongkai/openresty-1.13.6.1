@@ -135,7 +135,7 @@ ngx_http_lua_log_handler(ngx_http_request_t *r)
     return llcf->log_handler(r);
 }
 
-
+//log by lua 和 log by lua block 的执行回调
 ngx_int_t
 ngx_http_lua_log_handler_inline(ngx_http_request_t *r)
 {
@@ -162,7 +162,7 @@ ngx_http_lua_log_handler_inline(ngx_http_request_t *r)
     return ngx_http_lua_log_by_chunk(L, r);
 }
 
-
+//log by lua file 的执行回调
 ngx_int_t
 ngx_http_lua_log_handler_file(ngx_http_request_t *r)
 {

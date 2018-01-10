@@ -163,7 +163,7 @@ ngx_http_lua_access_handler(ngx_http_request_t *r)
     return llcf->access_handler(r);
 }
 
-
+//access by lua 和 access by lua block 的执行回调
 ngx_int_t
 ngx_http_lua_access_handler_inline(ngx_http_request_t *r)
 {
@@ -189,7 +189,7 @@ ngx_http_lua_access_handler_inline(ngx_http_request_t *r)
     return ngx_http_lua_access_by_chunk(L, r);
 }
 
-
+//access by lua 的执行回调
 ngx_int_t
 ngx_http_lua_access_handler_file(ngx_http_request_t *r)
 {

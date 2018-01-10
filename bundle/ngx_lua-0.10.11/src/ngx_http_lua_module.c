@@ -255,7 +255,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_rewrite_handler_inline },
 
     /* access_by_lua "<inline script>" */
-    { ngx_string("access_by_lua"),                                  //
+    { ngx_string("access_by_lua"),                                  //access
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_access_by_lua,
@@ -263,7 +263,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       0,
       (void *) ngx_http_lua_access_handler_inline },
 
-    /* access_by_lua_block { <inline script> } */
+    /* access_by_lua_block { <inline script> } */                   //access
     { ngx_string("access_by_lua_block"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_BLOCK|NGX_CONF_NOARGS,
@@ -273,7 +273,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_access_handler_inline },
 
     /* content_by_lua "<inline script>" */
-    { ngx_string("content_by_lua"),
+    { ngx_string("content_by_lua"),                                 //content
       NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_content_by_lua,
       NGX_HTTP_LOC_CONF_OFFSET,
@@ -281,7 +281,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_content_handler_inline },
 
     /* content_by_lua_block { <inline script> } */
-    { ngx_string("content_by_lua_block"),
+    { ngx_string("content_by_lua_block"),                           //content
       NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF|NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_lua_content_by_lua_block,
       NGX_HTTP_LOC_CONF_OFFSET,
@@ -289,7 +289,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_content_handler_inline },
 
     /* log_by_lua <inline script> */
-    { ngx_string("log_by_lua"),
+    { ngx_string("log_by_lua"),                                     //log
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_log_by_lua,
@@ -298,7 +298,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_log_handler_inline },
 
     /* log_by_lua_block { <inline script> } */
-    { ngx_string("log_by_lua_block"),
+    { ngx_string("log_by_lua_block"),                               //log
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_lua_log_by_lua_block,
@@ -321,7 +321,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_main_conf_t, postponed_to_rewrite_phase_end),
       NULL },
 
-    { ngx_string("access_by_lua_file"),
+    { ngx_string("access_by_lua_file"),                             //access
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_access_by_lua,
@@ -329,7 +329,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       0,
       (void *) ngx_http_lua_access_handler_file },
 
-    { ngx_string("access_by_lua_no_postpone"),
+    { ngx_string("access_by_lua_no_postpone"),                     //access by lua 默认被延迟到最后执行
       NGX_HTTP_MAIN_CONF|NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
       NGX_HTTP_MAIN_CONF_OFFSET,
@@ -337,14 +337,14 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       NULL },
 
     /* content_by_lua_file rel/or/abs/path/to/script */
-    { ngx_string("content_by_lua_file"),
+    { ngx_string("content_by_lua_file"),                           //content by lua
       NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_content_by_lua,
       NGX_HTTP_LOC_CONF_OFFSET,
       0,
       (void *) ngx_http_lua_content_handler_file },
 
-    { ngx_string("log_by_lua_file"),
+    { ngx_string("log_by_lua_file"),                               //log
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_log_by_lua,
@@ -353,7 +353,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_log_handler_file },
 
     /* header_filter_by_lua <inline script> */
-    { ngx_string("header_filter_by_lua"),
+    { ngx_string("header_filter_by_lua"),                           //
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_header_filter_by_lua,

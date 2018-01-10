@@ -567,7 +567,7 @@ ngx_http_lua_rewrite_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+//access by lua block
 char *
 ngx_http_lua_access_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -578,7 +578,7 @@ ngx_http_lua_access_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     save = *cf;
     cf->handler = ngx_http_lua_access_by_lua;
     cf->handler_conf = conf;
-
+    //block 被解析以后，还是一段脚本，在access by lua中执行
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -586,7 +586,8 @@ ngx_http_lua_access_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//access by lua      +  ngx_http_lua_access_handler_inline
+//access by lua file +  ngx_http_lua_access_handler_file
 char *
 ngx_http_lua_access_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -608,6 +609,7 @@ ngx_http_lua_access_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return "is duplicate";
     }
 
+    //参数分析
     value = cf->args->elts;
 
     if (value[1].len == 0) {
@@ -619,6 +621,7 @@ ngx_http_lua_access_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     if (cmd->post == ngx_http_lua_access_handler_inline) {
+        //非文件情况下
         chunkname = ngx_http_lua_gen_chunk_name(cf, "access_by_lua",
                                                 sizeof("access_by_lua") - 1);
         if (chunkname == NULL) {
@@ -647,7 +650,7 @@ ngx_http_lua_access_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         ccv.cf = cf;
         ccv.value = &value[1];
         ccv.complex_value = &llcf->access_src;
-
+        //要去计算以下，然后填充在llcf->access_src，路径么。
         if (ngx_http_compile_complex_value(&ccv) != NGX_OK) {
             return NGX_CONF_ERROR;
         }
@@ -659,6 +662,7 @@ ngx_http_lua_access_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
                 return NGX_CONF_ERROR;
             }
 
+            //计算给key
             llcf->access_src_key = p;
 
             p = ngx_copy(p, NGX_HTTP_LUA_FILE_TAG, NGX_HTTP_LUA_FILE_TAG_LEN);
@@ -667,6 +671,7 @@ ngx_http_lua_access_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         }
     }
 
+    //access by lua 执行回调
     llcf->access_handler = (ngx_http_handler_pt) cmd->post;
 
     lmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_lua_module);
@@ -677,7 +682,7 @@ ngx_http_lua_access_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+//content by lua block 的执行回调
 char *
 ngx_http_lua_content_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -688,7 +693,7 @@ ngx_http_lua_content_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     save = *cf;
     cf->handler = ngx_http_lua_content_by_lua;
     cf->handler_conf = conf;
-
+    //block 被解析以后最后还是调用 ngx_http_lua_content_by_lua
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -696,7 +701,8 @@ ngx_http_lua_content_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//content by lua      + ngx_http_lua_content_handler_inline
+//content by lua file + ngx_http_lua_content_handler_file
 char *
 ngx_http_lua_content_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -720,6 +726,7 @@ ngx_http_lua_content_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return "is duplicate";
     }
 
+    //参数解析
     value = cf->args->elts;
 
     dd("value[0]: %.*s", (int) value[0].len, value[0].data);
@@ -733,6 +740,7 @@ ngx_http_lua_content_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     if (cmd->post == ngx_http_lua_content_handler_inline) {
+        //非文件时
         chunkname = ngx_http_lua_gen_chunk_name(cf, "content_by_lua",
                                                 sizeof("content_by_lua") - 1);
         if (chunkname == NULL) {
@@ -800,7 +808,7 @@ ngx_http_lua_content_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+//log by lua block 的命令回调
 char *
 ngx_http_lua_log_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -811,7 +819,7 @@ ngx_http_lua_log_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     save = *cf;
     cf->handler = ngx_http_lua_log_by_lua;
     cf->handler_conf = conf;
-
+    //block 被解析以后还是执行 ngx_http_lua_log_by_lua
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -819,7 +827,8 @@ ngx_http_lua_log_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//log by lua      + ngx_http_lua_log_handler_inline
+//log by lua file + ngx_http_lua_log_handler_file
 char *
 ngx_http_lua_log_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -841,6 +850,7 @@ ngx_http_lua_log_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return "is duplicate";
     }
 
+    //解析参数
     value = cf->args->elts;
 
     if (value[1].len == 0) {
@@ -852,6 +862,7 @@ ngx_http_lua_log_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     }
 
     if (cmd->post == ngx_http_lua_log_handler_inline) {
+        //非文件
         chunkname = ngx_http_lua_gen_chunk_name(cf, "log_by_lua",
                                                 sizeof("log_by_lua") - 1);
         if (chunkname == NULL) {

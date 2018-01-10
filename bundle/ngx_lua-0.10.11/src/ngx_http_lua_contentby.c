@@ -242,7 +242,7 @@ ngx_http_lua_content_phase_post_read(ngx_http_request_t *r)
     }
 }
 
-
+//content by lua 的执行回调
 ngx_int_t
 ngx_http_lua_content_handler_file(ngx_http_request_t *r)
 {
@@ -284,7 +284,7 @@ ngx_http_lua_content_handler_file(ngx_http_request_t *r)
     return ngx_http_lua_content_by_chunk(L, r);
 }
 
-
+//content by lua 和 content by lua block 的执行回调
 ngx_int_t
 ngx_http_lua_content_handler_inline(ngx_http_request_t *r)
 {
