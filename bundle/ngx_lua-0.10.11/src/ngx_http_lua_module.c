@@ -353,7 +353,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_log_handler_file },
 
     /* header_filter_by_lua <inline script> */
-    { ngx_string("header_filter_by_lua"),                           //
+    { ngx_string("header_filter_by_lua"),                           //header filter
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_header_filter_by_lua,
@@ -362,7 +362,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_header_filter_inline },
 
     /* header_filter_by_lua_block { <inline script> } */
-    { ngx_string("header_filter_by_lua_block"),
+    { ngx_string("header_filter_by_lua_block"),                     //header filter
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_lua_header_filter_by_lua_block,
@@ -370,7 +370,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       0,
       (void *) ngx_http_lua_header_filter_inline },
 
-    { ngx_string("header_filter_by_lua_file"),
+    { ngx_string("header_filter_by_lua_file"),                      //header filter
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_header_filter_by_lua,
@@ -378,7 +378,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       0,
       (void *) ngx_http_lua_header_filter_file },
 
-    { ngx_string("body_filter_by_lua"),
+    { ngx_string("body_filter_by_lua"),                             //body filter
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_body_filter_by_lua,
@@ -387,7 +387,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_body_filter_inline },
 
     /* body_filter_by_lua_block { <inline script> } */
-    { ngx_string("body_filter_by_lua_block"),
+    { ngx_string("body_filter_by_lua_block"),                       //body filter
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_lua_body_filter_by_lua_block,
@@ -395,7 +395,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       0,
       (void *) ngx_http_lua_body_filter_inline },
 
-    { ngx_string("body_filter_by_lua_file"),
+    { ngx_string("body_filter_by_lua_file"),                        //body filter
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_TAKE1,
       ngx_http_lua_body_filter_by_lua,
@@ -403,14 +403,14 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       0,
       (void *) ngx_http_lua_body_filter_file },
 
-    { ngx_string("balancer_by_lua_block"),
+    { ngx_string("balancer_by_lua_block"),                          //balancer by lua 只有block
       NGX_HTTP_UPS_CONF|NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_lua_balancer_by_lua_block,
       NGX_HTTP_SRV_CONF_OFFSET,
       0,
       (void *) ngx_http_lua_balancer_handler_inline },
 
-    { ngx_string("balancer_by_lua_file"),
+    { ngx_string("balancer_by_lua_file"),                           //balancer by lua
       NGX_HTTP_UPS_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_balancer_by_lua,
       NGX_HTTP_SRV_CONF_OFFSET,

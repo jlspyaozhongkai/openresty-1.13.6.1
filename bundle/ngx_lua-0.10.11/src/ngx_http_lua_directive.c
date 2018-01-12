@@ -920,7 +920,7 @@ ngx_http_lua_log_by_lua(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+//header filter by lua block的命令回调
 char *
 ngx_http_lua_header_filter_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -931,7 +931,7 @@ ngx_http_lua_header_filter_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     save = *cf;
     cf->handler = ngx_http_lua_header_filter_by_lua;
     cf->handler_conf = conf;
-
+    //block 被解析成脚本以后 还是会调用 ngx_http_lua_header_filter_by_lua
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -939,7 +939,8 @@ ngx_http_lua_header_filter_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//header filter by lua      + ngx_http_lua_header_filter_inline
+//header filter by lua file + ngx_http_lua_header_filter_file
 char *
 ngx_http_lua_header_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -962,6 +963,7 @@ ngx_http_lua_header_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         return "is duplicate";
     }
 
+    //参数分析
     value = cf->args->elts;
 
     if (value[1].len == 0) {
@@ -972,6 +974,7 @@ ngx_http_lua_header_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     }
 
     if (cmd->post == ngx_http_lua_header_filter_inline) {
+        //非文件
         /* Don't eval nginx variables for inline lua code */
         llcf->header_filter_src.value = value[1];
 
@@ -992,6 +995,7 @@ ngx_http_lua_header_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         ccv.value = &value[1];
         ccv.complex_value = &llcf->header_filter_src;
 
+        //算得llcf->header_filter_src
         if (ngx_http_compile_complex_value(&ccv) != NGX_OK) {
             return NGX_CONF_ERROR;
         }
@@ -1011,6 +1015,7 @@ ngx_http_lua_header_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         }
     }
 
+    //设置回调和标志
     llcf->header_filter_handler = (ngx_http_handler_pt) cmd->post;
 
     lmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_lua_module);
@@ -1020,7 +1025,7 @@ ngx_http_lua_header_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     return NGX_CONF_OK;
 }
 
-
+//body filter by lua block 的命令回调
 char *
 ngx_http_lua_body_filter_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -1031,7 +1036,7 @@ ngx_http_lua_body_filter_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     save = *cf;
     cf->handler = ngx_http_lua_body_filter_by_lua;
     cf->handler_conf = conf;
-
+    //解析出脚本还是要调用 ngx_http_lua_body_filter_by_lua
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -1039,7 +1044,8 @@ ngx_http_lua_body_filter_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//body filter by lua       + ngx_http_lua_body_filter_inline
+//body filter by lua file  + ngx_http_lua_body_filter_file
 char *
 ngx_http_lua_body_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -1062,6 +1068,7 @@ ngx_http_lua_body_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         return "is duplicate";
     }
 
+    //参数解析
     value = cf->args->elts;
 
     if (value[1].len == 0) {
@@ -1072,6 +1079,7 @@ ngx_http_lua_body_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     }
 
     if (cmd->post == ngx_http_lua_body_filter_inline) {
+        //非文件
         /* Don't eval nginx variables for inline lua code */
         llcf->body_filter_src.value = value[1];
 
@@ -1111,6 +1119,7 @@ ngx_http_lua_body_filter_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         }
     }
 
+    //设置回调
     llcf->body_filter_handler = (ngx_http_output_body_filter_pt) cmd->post;
 
     lmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_lua_module);

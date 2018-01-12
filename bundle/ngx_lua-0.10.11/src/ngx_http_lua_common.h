@@ -225,8 +225,8 @@ struct ngx_http_lua_main_conf_s {
     ngx_int_t            busy_buf_ptr_count;
 #endif
 
-    unsigned             requires_header_filter:1;
-    unsigned             requires_body_filter:1;
+    unsigned             requires_header_filter:1;          //header filter会设置，body filter会设置
+    unsigned             requires_body_filter:1;            //body filter会设置
     unsigned             requires_capture_filter:1;         //access 和 content 会设置
     unsigned             requires_rewrite:1;                //有rewrite
     unsigned             requires_access:1;                 //有access by lua
@@ -254,11 +254,11 @@ union ngx_http_lua_srv_conf_u {
 #endif
 
     struct {
-        ngx_str_t           src;
-        u_char             *src_key;
+        ngx_str_t           src;                                //handler 的参数 是脚本或者是路径
+        u_char             *src_key;                            //src 算得的key
 
-        ngx_http_lua_srv_conf_handler_pt  handler;
-    } balancer;
+        ngx_http_lua_srv_conf_handler_pt  handler;              //balancer by lua 的执行回调
+    } balancer;                                                 //配置在upstream中
 };
 
 //Nginx lua 在location 级别上的配置
@@ -282,9 +282,9 @@ typedef struct {
     ngx_http_handler_pt     access_handler;                                                 //access执行回调
     ngx_http_handler_pt     content_handler;                                                //content执行回调
     ngx_http_handler_pt     log_handler;                                                    //log 执行回调
-    ngx_http_handler_pt     header_filter_handler;
+    ngx_http_handler_pt     header_filter_handler;                                          //header filter 执行回调
 
-    ngx_http_output_body_filter_pt         body_filter_handler;
+    ngx_http_output_body_filter_pt         body_filter_handler;         //body filter的filter
 
     u_char                  *rewrite_chunkname;     //
     ngx_http_complex_value_t rewrite_src;           //rewrite 的回调参数，里边是脚本或者路径
@@ -311,16 +311,15 @@ typedef struct {
 
     u_char                      *log_src_key; /* cached key for log_src */       //log_src 算得的key
 
-    ngx_http_complex_value_t header_filter_src;  /*  header_filter_by_lua
-                                                     inline script/script
-                                                     file path */
+    ngx_http_complex_value_t header_filter_src;   //header filter by lua的回调参数，里边是脚本或者是路径
+                                                  /*  header_filter_by_lua inline script/script file path */
 
-    u_char                 *header_filter_src_key;
+    u_char                 *header_filter_src_key;                               //header_filter_src 算得的key
                                     /* cached key for header_filter_src */
 
 
-    ngx_http_complex_value_t         body_filter_src;
-    u_char                          *body_filter_src_key;
+    ngx_http_complex_value_t         body_filter_src;                           //body_filter_handler的参数
+    u_char                          *body_filter_src_key;                       //body_filter_src算得的key
 
     ngx_msec_t                       keepalive_timeout;
     ngx_msec_t                       connect_timeout;

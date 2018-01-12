@@ -57,7 +57,7 @@ static ngx_int_t ngx_http_lua_balancer_by_chunk(lua_State *L,
 void ngx_http_lua_balancer_free_peer(ngx_peer_connection_t *pc, void *data,
     ngx_uint_t state);
 
-
+//balancer by lua file 的执行回调
 ngx_int_t
 ngx_http_lua_balancer_handler_file(ngx_http_request_t *r,
     ngx_http_lua_srv_conf_t *lscf, lua_State *L)
@@ -77,7 +77,7 @@ ngx_http_lua_balancer_handler_file(ngx_http_request_t *r,
     return ngx_http_lua_balancer_by_chunk(L, r);
 }
 
-
+//balnacer by lua block 的执行回调
 ngx_int_t
 ngx_http_lua_balancer_handler_inline(ngx_http_request_t *r,
     ngx_http_lua_srv_conf_t *lscf, lua_State *L)
@@ -99,7 +99,7 @@ ngx_http_lua_balancer_handler_inline(ngx_http_request_t *r,
     return ngx_http_lua_balancer_by_chunk(L, r);
 }
 
-
+//balancer by lua block 的命令回调
 char *
 ngx_http_lua_balancer_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -110,7 +110,7 @@ ngx_http_lua_balancer_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     save = *cf;
     cf->handler = ngx_http_lua_balancer_by_lua;
     cf->handler_conf = conf;
-
+    //最终还是调用了 ngx_http_lua_balancer_by_lua
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -118,7 +118,8 @@ ngx_http_lua_balancer_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//balancer by lua block + ngx_http_lua_balancer_handler_inline
+//balancer by lua file  + ngx_http_lua_balancer_handler_file
 char *
 ngx_http_lua_balancer_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -137,15 +138,19 @@ ngx_http_lua_balancer_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         return NGX_CONF_ERROR;
     }
 
+    //lscf 是upstream的配置，所在upstream的配置
     if (lscf->balancer.handler) {
         return "is duplicate";
     }
 
+    //参数解析
     value = cf->args->elts;
 
+    //配置执行回调
     lscf->balancer.handler = (ngx_http_lua_srv_conf_handler_pt) cmd->post;
 
     if (cmd->post == ngx_http_lua_balancer_handler_file) {
+        //文件
         /* Lua code in an external file */
 
         name = ngx_http_lua_rebase_path(cf->pool, value[1].data,
@@ -169,6 +174,7 @@ ngx_http_lua_balancer_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         *p = '\0';
 
     } else {
+        //非文件
         /* inlined Lua code */
 
         lscf->balancer.src = value[1];
@@ -185,6 +191,7 @@ ngx_http_lua_balancer_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         *p = '\0';
     }
 
+    //
     uscf = ngx_http_conf_get_module_srv_conf(cf, ngx_http_upstream_module);
 
     if (uscf->peer.init_upstream) {

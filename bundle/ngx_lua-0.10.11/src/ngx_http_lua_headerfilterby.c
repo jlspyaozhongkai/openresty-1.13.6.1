@@ -155,7 +155,7 @@ ngx_http_lua_header_filter_by_chunk(lua_State *L, ngx_http_request_t *r)
     return NGX_OK;
 }
 
-
+//header filter by lua 的执行回调
 ngx_int_t
 ngx_http_lua_header_filter_inline(ngx_http_request_t *r)
 {
@@ -182,7 +182,7 @@ ngx_http_lua_header_filter_inline(ngx_http_request_t *r)
     return ngx_http_lua_header_filter_by_chunk(L, r);
 }
 
-
+//header filter by lua file 的执行回调
 ngx_int_t
 ngx_http_lua_header_filter_file(ngx_http_request_t *r)
 {
