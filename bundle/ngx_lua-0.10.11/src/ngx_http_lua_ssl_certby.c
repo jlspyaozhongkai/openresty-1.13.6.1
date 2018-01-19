@@ -38,6 +38,7 @@ static ngx_int_t ngx_http_lua_ssl_cert_by_chunk(lua_State *L,
     ngx_http_request_t *r);
 
 
+//ssl_certificate_by_lua_file 执行回调
 ngx_int_t
 ngx_http_lua_ssl_cert_handler_file(ngx_http_request_t *r,
     ngx_http_lua_srv_conf_t *lscf, lua_State *L)
@@ -58,6 +59,7 @@ ngx_http_lua_ssl_cert_handler_file(ngx_http_request_t *r,
 }
 
 
+//ssl_certificate_by_lua_block 执行回调
 ngx_int_t
 ngx_http_lua_ssl_cert_handler_inline(ngx_http_request_t *r,
     ngx_http_lua_srv_conf_t *lscf, lua_State *L)
@@ -80,6 +82,7 @@ ngx_http_lua_ssl_cert_handler_inline(ngx_http_request_t *r,
 }
 
 
+//ssl_certificate_by_lua_block 命令回调
 char *
 ngx_http_lua_ssl_cert_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -91,6 +94,7 @@ ngx_http_lua_ssl_cert_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     cf->handler = ngx_http_lua_ssl_cert_by_lua;
     cf->handler_conf = conf;
 
+    //解析出脚本以后执行ngx_http_lua_ssl_cert_by_lua
     rv = ngx_http_lua_conf_lua_block_parse(cf, cmd);
 
     *cf = save;
@@ -98,7 +102,8 @@ ngx_http_lua_ssl_cert_by_lua_block(ngx_conf_t *cf, ngx_command_t *cmd,
     return rv;
 }
 
-
+//ssl_certificate_by_lua_block 命令回调
+//ssl_certificate_by_lua_file 命令回调
 char *
 ngx_http_lua_ssl_cert_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     void *conf)
@@ -131,11 +136,14 @@ ngx_http_lua_ssl_cert_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         return NGX_CONF_ERROR;
     }
 
+    //参数
     value = cf->args->elts;
 
+    //lscf 是server一级的配置结构
     lscf->srv.ssl_cert_handler = (ngx_http_lua_srv_conf_handler_pt) cmd->post;
 
     if (cmd->post == ngx_http_lua_ssl_cert_handler_file) {
+        //文件
         /* Lua code in an external file */
 
         name = ngx_http_lua_rebase_path(cf->pool, value[1].data,
@@ -159,6 +167,7 @@ ngx_http_lua_ssl_cert_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         *p = '\0';
 
     } else {
+        //非文件
         /* inlined Lua code */
 
         lscf->srv.ssl_cert_src = value[1];

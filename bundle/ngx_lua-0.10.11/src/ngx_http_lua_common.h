@@ -239,9 +239,9 @@ struct ngx_http_lua_main_conf_s {
 union ngx_http_lua_srv_conf_u {
 #if (NGX_HTTP_SSL)
     struct {
-        ngx_http_lua_srv_conf_handler_pt     ssl_cert_handler;
-        ngx_str_t                            ssl_cert_src;
-        u_char                              *ssl_cert_src_key;
+        ngx_http_lua_srv_conf_handler_pt     ssl_cert_handler;              //ssl 握手执行回调
+        ngx_str_t                            ssl_cert_src;                  //ssl_cert_handler 的参数，是脚本或者是文件
+        u_char                              *ssl_cert_src_key;              //ssl_cert_src 算得的key
 
         ngx_http_lua_srv_conf_handler_pt     ssl_sess_store_handler;
         ngx_str_t                            ssl_sess_store_src;
@@ -264,7 +264,7 @@ union ngx_http_lua_srv_conf_u {
 //Nginx lua 在location 级别上的配置
 typedef struct {
 #if (NGX_HTTP_SSL)
-    ngx_ssl_t              *ssl;  /* shared by SSL cosockets */
+    ngx_ssl_t              *ssl;  /* shared by SSL cosockets */         //
     ngx_uint_t              ssl_protocols;
     ngx_str_t               ssl_ciphers;
     ngx_uint_t              ssl_verify_depth;
@@ -333,8 +333,8 @@ typedef struct {
 
     ngx_flag_t                       transform_underscores_in_resp_headers;     //矫正Http头中不规范的下划线用的
     ngx_flag_t                       log_socket_errors;                         //是否打开cosocket日志
-    ngx_flag_t                       check_client_abort;
-    ngx_flag_t                       use_default_type;
+    ngx_flag_t                       check_client_abort;                        //监控客户端断开时是否终端执行
+    ngx_flag_t                       use_default_type;                          //是否执行location中的default type
 } ngx_http_lua_loc_conf_t;
 
 

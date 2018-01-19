@@ -481,7 +481,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, http10_buffering),
       NULL },
 
-    { ngx_string("lua_check_client_abort"),                         //
+    { ngx_string("lua_check_client_abort"),                         //监控客户端关闭时 终端执行
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
@@ -489,7 +489,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, check_client_abort),
       NULL },
 
-    { ngx_string("lua_use_default_type"),
+    { ngx_string("lua_use_default_type"),                           //是否使用location里边的default type
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
@@ -501,7 +501,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
 
 #   if defined(nginx_version) && nginx_version >= 1001013
 
-    { ngx_string("lua_ssl_protocols"),
+    { ngx_string("lua_ssl_protocols"),                              //tcpsock:sslhandshake  cosocket ssl的协议列表
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_1MORE,
       ngx_conf_set_bitmask_slot,
       NGX_HTTP_LOC_CONF_OFFSET,
@@ -510,21 +510,21 @@ static ngx_command_t ngx_http_lua_cmds[] = {
 
 #   endif
 
-    { ngx_string("lua_ssl_ciphers"),
+    { ngx_string("lua_ssl_ciphers"),                                //cosocket ssl 加密方式
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_str_slot,
       NGX_HTTP_LOC_CONF_OFFSET,
       offsetof(ngx_http_lua_loc_conf_t, ssl_ciphers),
       NULL },
 
-    { ngx_string("ssl_certificate_by_lua_block"),
+    { ngx_string("ssl_certificate_by_lua_block"),                   //nginx ssl 握手
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_BLOCK|NGX_CONF_NOARGS,
       ngx_http_lua_ssl_cert_by_lua_block,
       NGX_HTTP_SRV_CONF_OFFSET,
       0,
       (void *) ngx_http_lua_ssl_cert_handler_inline },
 
-    { ngx_string("ssl_certificate_by_lua_file"),
+    { ngx_string("ssl_certificate_by_lua_file"),                    //nginx ssl 握手
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_ssl_cert_by_lua,
       NGX_HTTP_SRV_CONF_OFFSET,
@@ -566,7 +566,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, ssl_verify_depth),
       NULL },
 
-    { ngx_string("lua_ssl_trusted_certificate"),
+    { ngx_string("lua_ssl_trusted_certificate"),                                //cosocket ssl 信任CA证书列表
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_str_slot,
       NGX_HTTP_LOC_CONF_OFFSET,
