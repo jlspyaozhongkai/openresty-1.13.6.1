@@ -276,7 +276,7 @@ typedef struct {
 
     ngx_flag_t              enable_code_cache; /* whether to enable code cache */            //lua 缓存开启关闭
 
-    ngx_flag_t              http10_buffering;
+    ngx_flag_t              http10_buffering;                                               //http 1.0 无content-length时是否开缓冲区
 
     ngx_http_handler_pt     rewrite_handler;                                                //rewrite执行回调
     ngx_http_handler_pt     access_handler;                                                 //access执行回调
@@ -321,15 +321,15 @@ typedef struct {
     ngx_http_complex_value_t         body_filter_src;                           //body_filter_handler的参数
     u_char                          *body_filter_src_key;                       //body_filter_src算得的key
 
-    ngx_msec_t                       keepalive_timeout;
-    ngx_msec_t                       connect_timeout;
-    ngx_msec_t                       send_timeout;
-    ngx_msec_t                       read_timeout;
+    ngx_msec_t                       keepalive_timeout;                         //cosocket 的keepalive时间
+    ngx_msec_t                       connect_timeout;                           //cosocket 的连接超时时间
+    ngx_msec_t                       send_timeout;                              //cosocket 的发送超时时间
+    ngx_msec_t                       read_timeout;                              //cosocket 的接收超时时间
 
-    size_t                           send_lowat;
-    size_t                           buffer_size;
+    size_t                           send_lowat;                                //cosocket 缓冲区低水线
+    size_t                           buffer_size;                               //cosocket 缓冲区大小
 
-    ngx_uint_t                       pool_size;
+    ngx_uint_t                       pool_size;                                 //cosocket 连接池大小
 
     ngx_flag_t                       transform_underscores_in_resp_headers;     //矫正Http头中不规范的下划线用的
     ngx_flag_t                       log_socket_errors;                         //是否打开cosocket日志

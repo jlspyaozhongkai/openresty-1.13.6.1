@@ -411,13 +411,13 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       (void *) ngx_http_lua_balancer_handler_inline },
 
     { ngx_string("balancer_by_lua_file"),                           //balancer by lua
-      NGX_HTTP_UPS_CONF|NGX_CONF_TAKE1,
+      NGX_HTTP_UPS_CONF|NGX_CONF_TAKE1,                             //是配置在UpStream中的配置
       ngx_http_lua_balancer_by_lua,
       NGX_HTTP_SRV_CONF_OFFSET,
       0,
       (void *) ngx_http_lua_balancer_handler_file },
 
-    { ngx_string("lua_socket_keepalive_timeout"),
+    { ngx_string("lua_socket_keepalive_timeout"),                   //cosocket keepalive 的存在时间
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
           |NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_msec_slot,
@@ -425,7 +425,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, keepalive_timeout),
       NULL },
 
-    { ngx_string("lua_socket_connect_timeout"),
+    { ngx_string("lua_socket_connect_timeout"),                     //cosocket的连接超时时间
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
           |NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_msec_slot,
@@ -433,7 +433,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, connect_timeout),
       NULL },
 
-    { ngx_string("lua_socket_send_timeout"),
+    { ngx_string("lua_socket_send_timeout"),                        //cosocket的连接超时时间
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
           |NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_msec_slot,
@@ -441,7 +441,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, send_timeout),
       NULL },
 
-    { ngx_string("lua_socket_send_lowat"),
+    { ngx_string("lua_socket_send_lowat"),                          //cosokcet缓冲区设定
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
           |NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_size_slot,
@@ -449,7 +449,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, send_lowat),
       &ngx_http_lua_lowat_post },
 
-    { ngx_string("lua_socket_buffer_size"),
+    { ngx_string("lua_socket_buffer_size"),                         //cosocket缓冲区大小
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
           |NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_size_slot,
@@ -457,7 +457,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, buffer_size),
       NULL },
 
-    { ngx_string("lua_socket_pool_size"),
+    { ngx_string("lua_socket_pool_size"),                           //cosocket 连接池大小
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
                         |NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_num_slot,
@@ -465,7 +465,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, pool_size),
       NULL },
 
-    { ngx_string("lua_socket_read_timeout"),
+    { ngx_string("lua_socket_read_timeout"),                        //cosocket 发送超时
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF
           |NGX_HTTP_LIF_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_msec_slot,
@@ -473,7 +473,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, read_timeout),
       NULL },
 
-    { ngx_string("lua_http10_buffering"),
+    { ngx_string("lua_http10_buffering"),                           //http 1.0不支持trunk，不指定content-length时需要先缓冲
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,
@@ -481,7 +481,7 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, http10_buffering),
       NULL },
 
-    { ngx_string("lua_check_client_abort"),
+    { ngx_string("lua_check_client_abort"),                         //
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
                         |NGX_CONF_FLAG,
       ngx_conf_set_flag_slot,

@@ -146,7 +146,7 @@ ngx_http_lua_balancer_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
     //参数解析
     value = cf->args->elts;
 
-    //配置执行回调
+    //配置执行回调，先设置上
     lscf->balancer.handler = (ngx_http_lua_srv_conf_handler_pt) cmd->post;
 
     if (cmd->post == ngx_http_lua_balancer_handler_file) {
@@ -191,7 +191,7 @@ ngx_http_lua_balancer_by_lua(ngx_conf_t *cf, ngx_command_t *cmd,
         *p = '\0';
     }
 
-    //
+    //取这个upstream的upstream配置，就是在配置upstream
     uscf = ngx_http_conf_get_module_srv_conf(cf, ngx_http_upstream_module);
 
     if (uscf->peer.init_upstream) {
