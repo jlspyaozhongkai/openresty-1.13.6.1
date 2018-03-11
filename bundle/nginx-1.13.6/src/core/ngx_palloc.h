@@ -26,18 +26,18 @@
     ngx_align((sizeof(ngx_pool_t) + 2 * sizeof(ngx_pool_large_t)),            \
               NGX_POOL_ALIGNMENT)
 
-
+//基于内存池的cleanup回调
 typedef void (*ngx_pool_cleanup_pt)(void *data);
 
 typedef struct ngx_pool_cleanup_s  ngx_pool_cleanup_t;
 
 struct ngx_pool_cleanup_s {
     ngx_pool_cleanup_pt   handler;
-    void                 *data;
+    void                 *data;			//调用 ngx_pool_cleanup_add 时可以为其分配内存
     ngx_pool_cleanup_t   *next;
 };
 
-
+//
 typedef struct ngx_pool_large_s  ngx_pool_large_t;
 
 struct ngx_pool_large_s {
@@ -45,7 +45,7 @@ struct ngx_pool_large_s {
     void                 *alloc;
 };
 
-
+//Nginx内存池
 typedef struct {
     u_char               *last;
     u_char               *end;
@@ -53,38 +53,39 @@ typedef struct {
     ngx_uint_t            failed;
 } ngx_pool_data_t;
 
-
 struct ngx_pool_s {
     ngx_pool_data_t       d;
     size_t                max;
     ngx_pool_t           *current;
     ngx_chain_t          *chain;
     ngx_pool_large_t     *large;
-    ngx_pool_cleanup_t   *cleanup;
+    ngx_pool_cleanup_t   *cleanup;		//所有的cleanup串成链
     ngx_log_t            *log;
 };
 
-
+//
 typedef struct {
     ngx_fd_t              fd;
     u_char               *name;
     ngx_log_t            *log;
 } ngx_pool_cleanup_file_t;
 
-
+//Nginx创建内存池
 ngx_pool_t *ngx_create_pool(size_t size, ngx_log_t *log);
 void ngx_destroy_pool(ngx_pool_t *pool);
 void ngx_reset_pool(ngx_pool_t *pool);
 
+//从内存池中分配和释放
 void *ngx_palloc(ngx_pool_t *pool, size_t size);
 void *ngx_pnalloc(ngx_pool_t *pool, size_t size);
 void *ngx_pcalloc(ngx_pool_t *pool, size_t size);
 void *ngx_pmemalign(ngx_pool_t *pool, size_t size, size_t alignment);
 ngx_int_t ngx_pfree(ngx_pool_t *pool, void *p);
 
-
+//添加一个cleanup节点
 ngx_pool_cleanup_t *ngx_pool_cleanup_add(ngx_pool_t *p, size_t size);
-void ngx_pool_run_cleanup_file(ngx_pool_t *p, ngx_fd_t fd);
+void ngx_pool_run_cleanup_file(ngx_pool_t *p, ngx_fd_t fd);		//对已经添加的ngx_pool_cleanup_file提前发作
+//以下是两种ngx_pool_cleanup_pt，现成的关于文件的cleanup
 void ngx_pool_cleanup_file(void *data);
 void ngx_pool_delete_file(void *data);
 

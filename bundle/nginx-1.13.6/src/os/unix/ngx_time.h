@@ -16,6 +16,7 @@
 typedef ngx_rbtree_key_t      ngx_msec_t;
 typedef ngx_rbtree_key_int_t  ngx_msec_int_t;
 
+//nginx日期使用了标准的日期结构
 typedef struct tm             ngx_tm_t;
 
 #define ngx_tm_sec            tm_sec

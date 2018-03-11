@@ -52,7 +52,7 @@
 #define NGX_ANY_CONF         0x1F000000
 
 
-
+//使用-1表示未做设置，好吧
 #define NGX_CONF_UNSET       -1
 #define NGX_CONF_UNSET_UINT  (ngx_uint_t) -1
 #define NGX_CONF_UNSET_PTR   (void *) -1
@@ -176,7 +176,7 @@ char *ngx_conf_check_num_bounds(ngx_conf_t *cf, void *post, void *data);
 #define ngx_get_conf(conf_ctx, module)  conf_ctx[module.index]
 
 
-
+//如果conf是未设置的，才能进行初始赋值（防止重复初始化）
 #define ngx_conf_init_value(conf, default)                                   \
     if (conf == NGX_CONF_UNSET) {                                            \
         conf = default;                                                      \
@@ -202,6 +202,8 @@ char *ngx_conf_check_num_bounds(ngx_conf_t *cf, void *post, void *data);
         conf = default;                                                      \
     }
 
+//如果conf是未设置的，就对其赋值。
+//赋值的来源尽量是prev，但如果prev为未设置，那么使用default
 #define ngx_conf_merge_value(conf, prev, default)                            \
     if (conf == NGX_CONF_UNSET) {                                            \
         conf = (prev == NGX_CONF_UNSET) ? default : prev;                    \
@@ -237,6 +239,7 @@ char *ngx_conf_check_num_bounds(ngx_conf_t *cf, void *post, void *data);
         conf = (prev == NGX_CONF_UNSET) ? default : prev;                    \
     }
 
+//字符串意思也是一样的
 #define ngx_conf_merge_str_value(conf, prev, default)                        \
     if (conf.data == NULL) {                                                 \
         if (prev.data) {                                                     \
@@ -264,7 +267,7 @@ char *ngx_conf_check_num_bounds(ngx_conf_t *cf, void *post, void *data);
         conf = (prev == 0) ? default : prev;                                 \
     }
 
-
+//
 char *ngx_conf_param(ngx_conf_t *cf);
 char *ngx_conf_parse(ngx_conf_t *cf, ngx_str_t *filename);
 char *ngx_conf_include(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);

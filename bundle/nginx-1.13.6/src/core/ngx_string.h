@@ -12,7 +12,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//nginx 字符串
 typedef struct {
     size_t      len;
     u_char     *data;
@@ -36,20 +36,22 @@ typedef struct {
     u_char     *data;
 } ngx_variable_value_t;
 
-
-#define ngx_string(str)     { sizeof(str) - 1, (u_char *) str }
+//做右值
+#define ngx_string(str)     { sizeof(str) - 1, (u_char *) str }		//str必须是“”字符串，否则sizeof就会取错
 #define ngx_null_string     { 0, NULL }
+
+//给str做设置
 #define ngx_str_set(str, text)                                               \
-    (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text
+    (str)->len = sizeof(text) - 1; (str)->data = (u_char *) text	//str必须是“”字符串
 #define ngx_str_null(str)   (str)->len = 0; (str)->data = NULL
 
-
+//char转换
 #define ngx_tolower(c)      (u_char) ((c >= 'A' && c <= 'Z') ? (c | 0x20) : c)
 #define ngx_toupper(c)      (u_char) ((c >= 'a' && c <= 'z') ? (c & ~0x20) : c)
 
 void ngx_strlow(u_char *dst, u_char *src, size_t n);
 
-
+//
 #define ngx_strncmp(s1, s2, n)  strncmp((const char *) s1, (const char *) s2, n)
 
 
@@ -79,7 +81,7 @@ ngx_strlchr(u_char *p, u_char *last, u_char c)
     return NULL;
 }
 
-
+//几个关于内存的接口
 /*
  * msvc and icc7 compile memset() to the inline "rep stos"
  * while ZeroMemory() and bzero() are the calls.
@@ -145,7 +147,7 @@ ngx_copy(u_char *dst, u_char *src, size_t len)
 /* msvc and icc7 compile memcmp() to the inline loop */
 #define ngx_memcmp(s1, s2, n)  memcmp((const char *) s1, (const char *) s2, n)
 
-
+//
 u_char *ngx_cpystrn(u_char *dst, u_char *src, size_t n);
 u_char *ngx_pstrdup(ngx_pool_t *pool, ngx_str_t *src);
 u_char * ngx_cdecl ngx_sprintf(u_char *buf, const char *fmt, ...);

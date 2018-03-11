@@ -8,6 +8,7 @@
 #ifndef _NGINX_H_INCLUDED_
 #define _NGINX_H_INCLUDED_
 
+/*只包含一些宏定义*/
 
 #define nginx_version      1013006
 #define NGINX_VERSION      "1.13.6"

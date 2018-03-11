@@ -75,6 +75,13 @@
 
 #endif
 
+/*
+另外几个会被使用的数据类型
+size_t  64bit 无符号
+off_t   64bit 无符号
+u_char  无符号字符
+下方定义的几个类型，是为了排除计算机字长的影响
+*/
 typedef intptr_t        ngx_int_t;
 typedef uintptr_t       ngx_uint_t;
 typedef intptr_t        ngx_flag_t;

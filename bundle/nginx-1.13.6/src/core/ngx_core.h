@@ -31,7 +31,7 @@ typedef struct ngx_ssl_connection_s  ngx_ssl_connection_t;
 typedef void (*ngx_event_handler_pt)(ngx_event_t *ev);
 typedef void (*ngx_connection_handler_pt)(ngx_connection_t *c);
 
-
+//Nginx的一些错误码
 #define  NGX_OK          0
 #define  NGX_ERROR      -1
 #define  NGX_AGAIN      -2

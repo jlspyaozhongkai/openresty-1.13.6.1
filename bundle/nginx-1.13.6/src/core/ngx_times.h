@@ -12,7 +12,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//Nginx的时间结构
 typedef struct {
     time_t      sec;
     ngx_uint_t  msec;
@@ -31,7 +31,7 @@ time_t ngx_next_time(time_t when);
 #define ngx_next_time_n      "mktime()"
 
 
-extern volatile ngx_time_t  *ngx_cached_time;
+extern volatile ngx_time_t  *ngx_cached_time;	//当前缓存时间，不稳定的，不会被编译优化
 
 #define ngx_time()           ngx_cached_time->sec
 #define ngx_timeofday()      (ngx_time_t *) ngx_cached_time

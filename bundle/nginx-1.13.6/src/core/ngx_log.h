@@ -12,7 +12,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//Log 级别
 #define NGX_LOG_STDERR            0
 #define NGX_LOG_EMERG             1
 #define NGX_LOG_ALERT             2
@@ -47,6 +47,7 @@ typedef void (*ngx_log_writer_pt) (ngx_log_t *log, ngx_uint_t level,
     u_char *buf, size_t len);
 
 
+//Nginx log结构
 struct ngx_log_s {
     ngx_uint_t           log_level;
     ngx_open_file_t     *file;
@@ -77,7 +78,7 @@ struct ngx_log_s {
 #define NGX_MAX_ERROR_STR   4096
 #endif
 
-
+//Nginx ngx log 接口
 /*********************************/
 
 #if (NGX_HAVE_C99_VARIADIC_MACROS)

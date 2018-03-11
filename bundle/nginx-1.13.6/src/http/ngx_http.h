@@ -8,7 +8,7 @@
 #ifndef _NGX_HTTP_H_INCLUDED_
 #define _NGX_HTTP_H_INCLUDED_
 
-
+/*总包括性目录，包含了大部分头文件和宏定义*/
 #include <ngx_config.h>
 #include <ngx_core.h>
 
