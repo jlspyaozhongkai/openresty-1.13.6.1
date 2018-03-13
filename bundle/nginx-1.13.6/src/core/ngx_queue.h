@@ -12,7 +12,7 @@
 #ifndef _NGX_QUEUE_H_INCLUDED_
 #define _NGX_QUEUE_H_INCLUDED_
 
-
+//Nginx双端队列，这个有点特点，是侵入式的
 typedef struct ngx_queue_s  ngx_queue_t;
 
 struct ngx_queue_s {
@@ -20,7 +20,7 @@ struct ngx_queue_s {
     ngx_queue_t  *next;
 };
 
-
+//初始化
 #define ngx_queue_init(q)                                                     \
     (q)->prev = q;                                                            \
     (q)->next = q

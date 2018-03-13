@@ -17,6 +17,7 @@ typedef void *            ngx_buf_tag_t;
 
 typedef struct ngx_buf_s  ngx_buf_t;
 
+//Nginx 缓冲区,buffer 值得深入研究，等遇到的时候
 struct ngx_buf_s {
     u_char          *pos;
     u_char          *last;
@@ -55,13 +56,14 @@ struct ngx_buf_s {
     /* STUB */ int   num;
 };
 
-
+//Nginx buffer 的高级结构
 struct ngx_chain_s {
     ngx_buf_t    *buf;
     ngx_chain_t  *next;
 };
 
 
+//
 typedef struct {
     ngx_int_t    num;
     size_t       size;

@@ -12,11 +12,11 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//Nginx 红黑树 的key
 typedef ngx_uint_t  ngx_rbtree_key_t;
 typedef ngx_int_t   ngx_rbtree_key_int_t;
 
-
+//Nginx 红黑树 Node
 typedef struct ngx_rbtree_node_s  ngx_rbtree_node_t;
 
 struct ngx_rbtree_node_s {
@@ -28,7 +28,7 @@ struct ngx_rbtree_node_s {
     u_char                 data;
 };
 
-
+//红黑树
 typedef struct ngx_rbtree_s  ngx_rbtree_t;
 
 typedef void (*ngx_rbtree_insert_pt) (ngx_rbtree_node_t *root,
@@ -47,7 +47,7 @@ struct ngx_rbtree_s {
     (tree)->sentinel = s;                                                     \
     (tree)->insert = i
 
-
+//红黑树操作,其中定时器作为一种特殊情况也在其中
 void ngx_rbtree_insert(ngx_rbtree_t *tree, ngx_rbtree_node_t *node);
 void ngx_rbtree_delete(ngx_rbtree_t *tree, ngx_rbtree_node_t *node);
 void ngx_rbtree_insert_value(ngx_rbtree_node_t *root, ngx_rbtree_node_t *node,

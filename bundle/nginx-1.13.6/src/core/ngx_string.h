@@ -19,6 +19,7 @@ typedef struct {
 } ngx_str_t;
 
 
+//Nginx key 和 value
 typedef struct {
     ngx_str_t   key;
     ngx_str_t   value;

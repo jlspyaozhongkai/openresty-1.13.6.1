@@ -12,7 +12,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 
-
+//Nginx 数组
 typedef struct {
     void        *elts;
     ngx_uint_t   nelts;
@@ -21,9 +21,11 @@ typedef struct {
     ngx_pool_t  *pool;
 } ngx_array_t;
 
-
+//Nginx 数组创建，参数分别为：pool, 成员尺寸，初始数量
 ngx_array_t *ngx_array_create(ngx_pool_t *p, ngx_uint_t n, size_t size);
 void ngx_array_destroy(ngx_array_t *a);
+
+//创建一个成员/或者多个成员，返回成员指针
 void *ngx_array_push(ngx_array_t *a);
 void *ngx_array_push_n(ngx_array_t *a, ngx_uint_t n);
 

@@ -71,7 +71,7 @@ typedef struct {
 #define NGX_HASH_WILDCARD_KEY     1
 #define NGX_HASH_READONLY_KEY     2
 
-
+//Nginx hash 表，也需要多研究研究
 typedef struct {
     ngx_uint_t        hsize;
 
