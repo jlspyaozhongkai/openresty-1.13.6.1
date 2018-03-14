@@ -17,8 +17,13 @@
  *        AAAA  number of arguments
  *      FF      command flags
  *    TT        command type, i.e. HTTP "location" or "server" command
+ * 按照上边的说明 
+ * 关于参数数量的选项分布在右边 0x 0000xxxx，占了一半
+ * 中间是标志                        0x 00xx0000
+ * 左边是关于位置的                     0x xx000000
  */
 
+//下边的宏是关于参数的数量
 #define NGX_CONF_NOARGS      0x00000001
 #define NGX_CONF_TAKE1       0x00000002
 #define NGX_CONF_TAKE2       0x00000004
@@ -46,11 +51,21 @@
 #define NGX_CONF_1MORE       0x00000800
 #define NGX_CONF_2MORE       0x00001000
 
+//命令的选项
 #define NGX_DIRECT_CONF      0x00010000
 
+/*
+关于命令的位置,下边是别处的代码
+#define NGX_HTTP_MAIN_CONF        0x02000000
+#define NGX_HTTP_SRV_CONF         0x04000000
+#define NGX_HTTP_LOC_CONF         0x08000000
+#define NGX_HTTP_UPS_CONF         0x10000000
+#define NGX_HTTP_SIF_CONF         0x20000000
+#define NGX_HTTP_LIF_CONF         0x40000000
+#define NGX_HTTP_LMT_CONF         0x80000000
+*/
 #define NGX_MAIN_CONF        0x01000000
 #define NGX_ANY_CONF         0x1F000000
-
 
 //使用-1表示未做设置，好吧
 #define NGX_CONF_UNSET       -1
@@ -73,7 +88,12 @@
 
 #define NGX_MAX_CONF_ERRSTR  1024
 
-
+/*
+offset域适用以下宏，是在ngx_http_conf_ctx_t结构中的偏移量
+#define NGX_HTTP_MAIN_CONF_OFFSET  offsetof(ngx_http_conf_ctx_t, main_conf)
+#define NGX_HTTP_SRV_CONF_OFFSET   offsetof(ngx_http_conf_ctx_t, srv_conf)
+#define NGX_HTTP_LOC_CONF_OFFSET   offsetof(ngx_http_conf_ctx_t, loc_conf)
+*/
 struct ngx_command_s {
     ngx_str_t             name;                 //命令的名字
     ngx_uint_t            type;                 //命令的各种选项
@@ -113,6 +133,7 @@ typedef char *(*ngx_conf_handler_pt)(ngx_conf_t *cf,
     ngx_command_t *dummy, void *conf);
 
 
+//Nginx配置句柄
 struct ngx_conf_s {
     char                 *name;
     ngx_array_t          *args;

@@ -219,7 +219,11 @@
 #define NGX_MODULE_V1_PADDING  0, 0, 0, 0, 0, 0, 0, 0
 
 
+/*nginx 模块定义，一个模块可能是http模块，也可能是event模块*/
 struct ngx_module_s {
+    /*----------------------------------------------------------------*/
+    //隔断区间的代码有套路，其中包括模块的版本，可以检查模块的版本是否现在被支持
+    //NGX_MODULE_V1  ^往上10行看         就提供了一组组合填充 
     ngx_uint_t            ctx_index;
     ngx_uint_t            index;
 
@@ -230,10 +234,12 @@ struct ngx_module_s {
 
     ngx_uint_t            version;
     const char           *signature;
+    /*----------------------------------------------------------------*/
 
-    void                 *ctx;
-    ngx_command_t        *commands;
-    ngx_uint_t            type;
+    void                 *ctx;			//不同类型的模块对ctx有不同的要求，必须遵守，
+    									//比如http模块就需要ngx_http_module_t
+    ngx_command_t        *commands;		//模块的命令 数组          直接到结束标志
+    ngx_uint_t            type;         //重点，
 
     ngx_int_t           (*init_master)(ngx_log_t *log);
 
@@ -246,7 +252,10 @@ struct ngx_module_s {
 
     void                (*exit_master)(ngx_cycle_t *cycle);
 
-    uintptr_t             spare_hook0;
+    /*----------------------------------------------------------------*/
+    //下边隔断中的代码有套路，NGX_MODULE_V1_PADDING,
+    //就是上边打NGX_MODULE_V1时，底下用这个填充，其实都是0
+	uintptr_t             spare_hook0;
     uintptr_t             spare_hook1;
     uintptr_t             spare_hook2;
     uintptr_t             spare_hook3;
@@ -254,9 +263,11 @@ struct ngx_module_s {
     uintptr_t             spare_hook5;
     uintptr_t             spare_hook6;
     uintptr_t             spare_hook7;
+	/*----------------------------------------------------------------*/
 };
 
 
+//Nginx core模块在此定义
 typedef struct {
     ngx_str_t             name;
     void               *(*create_conf)(ngx_cycle_t *cycle);
