@@ -85,7 +85,7 @@ typedef struct {
 #define NGX_HTTP_SRV_CONF_OFFSET   offsetof(ngx_http_conf_ctx_t, srv_conf)
 #define NGX_HTTP_LOC_CONF_OFFSET   offsetof(ngx_http_conf_ctx_t, loc_conf)
 
-/*如果参数是ngx_conf_s的ctx，那么使用下列宏取配置*/
+/*参数r是request，那么使用下列宏取配置，http 处理中使用*/
 #define ngx_http_get_module_main_conf(r, module)                             \
     (r)->main_conf[module.ctx_index]
 #define ngx_http_get_module_srv_conf(r, module)  (r)->srv_conf[module.ctx_index]
@@ -93,7 +93,7 @@ typedef struct {
 
 /*
 cf 是这个类型：ngx_conf_s, 所有模块的配置都使用
-取得ngx_http_conf_ctx_t后再使用
+取得ngx_http_conf_ctx_t后再使用，配置阶段使用
 */
 #define ngx_http_conf_get_module_main_conf(cf, module)                        \
     ((ngx_http_conf_ctx_t *) cf->ctx)->main_conf[module.ctx_index]

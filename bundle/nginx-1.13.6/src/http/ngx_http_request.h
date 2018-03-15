@@ -304,9 +304,10 @@ typedef struct {
 
 typedef struct ngx_http_addr_conf_s  ngx_http_addr_conf_t;
 
+//Http connection
 typedef struct {
     ngx_http_addr_conf_t             *addr_conf;
-    ngx_http_conf_ctx_t              *conf_ctx;
+    ngx_http_conf_ctx_t              *conf_ctx;			//连接的配置信息
 
 #if (NGX_HTTP_SSL || NGX_COMPAT)
     ngx_str_t                        *ssl_servername;
