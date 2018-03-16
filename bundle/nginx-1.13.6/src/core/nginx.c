@@ -283,6 +283,7 @@ main(int argc, char *const *argv)
         return 1;
     }
 
+	//Nginx 模块初始化
     if (ngx_preinit_modules() != NGX_OK) {
         return 1;
     }
@@ -1492,7 +1493,7 @@ ngx_set_worker_processes(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-
+//Nginx 加载模块
 static char *
 ngx_load_module(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -1532,6 +1533,7 @@ ngx_load_module(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     cln->handler = ngx_unload_module;
     cln->data = handle;
 
+	//加载模块的信息
     modules = ngx_dlsym(handle, "ngx_modules");
     if (modules == NULL) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
@@ -1554,6 +1556,7 @@ ngx_load_module(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         module = modules[i];
         module->name = names[i];
 
+		//添加模块
         if (ngx_add_module(cf, &file, module, order) != NGX_OK) {
             return NGX_CONF_ERROR;
         }

@@ -30,6 +30,8 @@ typedef struct {
 每个成员都是一个数组，每个http 模块都有自己的下标，然后通过下标得到自己的void *
 
 下标是这个： module.ctx_index ，模块在自己类别中的索引，所有http 模块中所得到的序号
+所指向的数据由 ngx_http_module_t 的 create_main_conf，create_srv_conf，create_loc_conf 
+所创建。
 */
 typedef struct {
     void        **main_conf;

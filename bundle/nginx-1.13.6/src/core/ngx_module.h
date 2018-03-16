@@ -285,6 +285,52 @@ ngx_int_t ngx_add_module(ngx_conf_t *cf, ngx_str_t *file,
     ngx_module_t *module, char **order);
 
 
+//注意下边的三个三个变量，configure的时候会生成objs/ngx_modules.c （和  Makefile）
+/*
+片段：
+extern ngx_module_t  ngx_stream_upstream_hash_module;
+extern ngx_module_t  ngx_stream_upstream_least_conn_module;
+extern ngx_module_t  ngx_stream_upstream_zone_module;
+extern ngx_module_t  ngx_stream_lua_module;
+
+ngx_module_t *ngx_modules[] = {
+    &ngx_core_module,
+    &ngx_errlog_module,
+    &ngx_conf_module,
+    &ngx_openssl_module,
+    &ngx_regex_module,
+    &ngx_events_module,
+    &ngx_event_core_module,
+    &ngx_epoll_module,
+    &ngx_http_module,
+    &ngx_http_core_module,
+    &ngx_http_log_module,
+    &ngx_http_upstream_module,
+    。。。。。。。
+    &ngx_stream_split_clients_module,
+    &ngx_stream_return_module,
+    &ngx_stream_upstream_hash_module,
+    &ngx_stream_upstream_least_conn_module,
+    &ngx_stream_upstream_zone_module,
+    &ngx_stream_lua_module,
+    NULL
+};
+
+char *ngx_module_names[] = {
+    "ngx_core_module",
+    "ngx_errlog_module",
+    "ngx_conf_module",
+    "ngx_openssl_module",
+    "ngx_regex_module",
+    "ngx_events_module",
+    "ngx_event_core_module",
+    "ngx_epoll_module",
+    "ngx_http_module",
+    "ngx_http_core_module",
+	。。。。。。。。。。
+
+ngx_max_module 会在初始化过程中被设置
+*/
 extern ngx_module_t  *ngx_modules[];
 extern ngx_uint_t     ngx_max_module;
 

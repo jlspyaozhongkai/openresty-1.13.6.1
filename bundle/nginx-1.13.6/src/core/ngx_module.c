@@ -27,18 +27,20 @@ ngx_preinit_modules(void)
 {
     ngx_uint_t  i;
 
+	//给所有的静态模块设置编号，也设置模块的名字（模块的名字来自configure配置生成）
     for (i = 0; ngx_modules[i]; i++) {
         ngx_modules[i]->index = i;
         ngx_modules[i]->name = ngx_module_names[i];
     }
-
+	//设置现在的模块数
     ngx_modules_n = i;
+	//算上可能的动态模块数，最多允许多少个模块
     ngx_max_module = ngx_modules_n + NGX_MAX_DYNAMIC_MODULES;
 
     return NGX_OK;
 }
 
-
+//往cycle里设置模块信息，至此模块就导入生命周期了
 ngx_int_t
 ngx_cycle_modules(ngx_cycle_t *cycle)
 {
@@ -46,13 +48,13 @@ ngx_cycle_modules(ngx_cycle_t *cycle)
      * create a list of modules to be used for this cycle,
      * copy static modules to it
      */
-
+	//创建模块数组（指针数组）
     cycle->modules = ngx_pcalloc(cycle->pool, (ngx_max_module + 1)
                                               * sizeof(ngx_module_t *));
     if (cycle->modules == NULL) {
         return NGX_ERROR;
     }
-
+	//拷贝已有的静态模块信息进来
     ngx_memcpy(cycle->modules, ngx_modules,
                ngx_modules_n * sizeof(ngx_module_t *));
 
@@ -78,7 +80,7 @@ ngx_init_modules(ngx_cycle_t *cycle)
     return NGX_OK;
 }
 
-
+//在cycle中数 某种 模块的数量
 ngx_int_t
 ngx_count_modules(ngx_cycle_t *cycle, ngx_uint_t type)
 {
@@ -97,6 +99,7 @@ ngx_count_modules(ngx_cycle_t *cycle, ngx_uint_t type)
             continue;
         }
 
+		//如果ctx_index 已经被设置，则收集最大ctx_index到max，next也能顺序的往前顶。
         if (module->ctx_index != NGX_MODULE_UNSET_INDEX) {
 
             /* if ctx_index was assigned, preserve it */
@@ -113,7 +116,7 @@ ngx_count_modules(ngx_cycle_t *cycle, ngx_uint_t type)
         }
 
         /* search for some free index */
-
+		//取下一个next，
         module->ctx_index = ngx_module_ctx_index(cycle, type, next);
 
         if (module->ctx_index > max) {
@@ -149,10 +152,12 @@ ngx_count_modules(ngx_cycle_t *cycle, ngx_uint_t type)
 
     cycle->modules_used = 1;
 
+	//
     return max + 1;
 }
 
 
+//添加静态模块，模块已经被加载
 ngx_int_t
 ngx_add_module(ngx_conf_t *cf, ngx_str_t *file, ngx_module_t *module,
     char **order)

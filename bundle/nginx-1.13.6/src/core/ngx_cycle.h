@@ -43,8 +43,12 @@ struct ngx_shm_zone_s {
     ngx_uint_t                noreuse;  /* unsigned  noreuse:1; */
 };
 
-
+//Nginx 生命周期结构
 struct ngx_cycle_s {
+	/*
+	conf_ctx 先按照最大模块数量分配成数组，这个每个模块就对应一个三重指针了，是不是舒服些
+	
+	*/
     void                  ****conf_ctx;
     ngx_pool_t               *pool;
 
@@ -57,8 +61,11 @@ struct ngx_cycle_s {
     ngx_connection_t         *free_connections;
     ngx_uint_t                free_connection_n;
 
+	//Nginx模块的数组，数组里边是模块的指针
+	//ngx_module_t里边的index是模块在这个modules里的索引位置
+	//ctx_index是各种类型中，模块所处的位置
     ngx_module_t            **modules;
-    ngx_uint_t                modules_n;
+    ngx_uint_t                modules_n;	//当前的模块数量，从静态模块数开始，modules里模块的数量
     ngx_uint_t                modules_used;    /* unsigned  modules_used:1; */
 
     ngx_queue_t               reusable_connections_queue;

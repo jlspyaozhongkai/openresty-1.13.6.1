@@ -133,7 +133,7 @@ typedef char *(*ngx_conf_handler_pt)(ngx_conf_t *cf,
     ngx_command_t *dummy, void *conf);
 
 
-//Nginx配置句柄
+//Nginx执行配置命令时的环境数据
 struct ngx_conf_s {
     char                 *name;
     ngx_array_t          *args;
