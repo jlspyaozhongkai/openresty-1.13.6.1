@@ -296,7 +296,7 @@ ngx_pfree(ngx_pool_t *pool, void *p)
     return NGX_DECLINED;
 }
 
-
+//分配内存，并顺带清0
 void *
 ngx_pcalloc(ngx_pool_t *pool, size_t size)
 {

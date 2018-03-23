@@ -64,9 +64,9 @@ struct ngx_cycle_s {
 	//Nginx模块的数组，数组里边是模块的指针
 	//ngx_module_t里边的index是模块在这个modules里的索引位置
 	//ctx_index是各种类型中，模块所处的位置
-    ngx_module_t            **modules;
-    ngx_uint_t                modules_n;	//当前的模块数量，从静态模块数开始，modules里模块的数量
-    ngx_uint_t                modules_used;    /* unsigned  modules_used:1; */
+    ngx_module_t            **modules;			//cycle中的模块数组
+    ngx_uint_t                modules_n;		//当前的模块数量，从静态模块数开始，modules里模块的数量
+    ngx_uint_t                modules_used;    /* unsigned  modules_used:1; */   //一旦设置为真，就不能再动态加载模块了
 
     ngx_queue_t               reusable_connections_queue;
     ngx_uint_t                reusable_connections_n;

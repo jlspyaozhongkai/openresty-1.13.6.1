@@ -283,7 +283,7 @@ main(int argc, char *const *argv)
         return 1;
     }
 
-	//Nginx 模块初始化
+	//Nginx 模块初始化，扫描模块数组，设置全局变量
     if (ngx_preinit_modules() != NGX_OK) {
         return 1;
     }
@@ -1493,7 +1493,7 @@ ngx_set_worker_processes(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
     return NGX_CONF_OK;
 }
 
-//Nginx 加载模块
+//Nginx 加载模块, load_module 的命令处理
 static char *
 ngx_load_module(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -1511,17 +1511,20 @@ ngx_load_module(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     value = cf->args->elts;
 
-    file = value[1];
+    file = value[1];	//文件名
 
+	//检查文件名
     if (ngx_conf_full_name(cf->cycle, &file, 0) != NGX_OK) {
         return NGX_CONF_ERROR;
     }
 
+	//卸载模块的cleanup 控制块
     cln = ngx_pool_cleanup_add(cf->cycle->pool, 0);
     if (cln == NULL) {
         return NGX_CONF_ERROR;
     }
 
+	//加载模块
     handle = ngx_dlopen(file.data);
     if (handle == NULL) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
@@ -1530,10 +1533,11 @@ ngx_load_module(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return NGX_CONF_ERROR;
     }
 
+	//设置清理
     cln->handler = ngx_unload_module;
     cln->data = handle;
 
-	//加载模块的信息
+	//获取模块 变量的地址
     modules = ngx_dlsym(handle, "ngx_modules");
     if (modules == NULL) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
@@ -1541,7 +1545,7 @@ ngx_load_module(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
                            &value[1], "ngx_modules", ngx_dlerror());
         return NGX_CONF_ERROR;
     }
-
+	//模块名的地址
     names = ngx_dlsym(handle, "ngx_module_names");
     if (names == NULL) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
@@ -1549,14 +1553,15 @@ ngx_load_module(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
                            &value[1], "ngx_module_names", ngx_dlerror());
         return NGX_CONF_ERROR;
     }
-
+	//order的地址
     order = ngx_dlsym(handle, "ngx_module_order");
 
+	//可能包含多个模块，一个一个加载
     for (i = 0; modules[i]; i++) {
         module = modules[i];
-        module->name = names[i];
+        module->name = names[i];	//提前设置模块的名字
 
-		//添加模块
+		//添加模块，去设置
         if (ngx_add_module(cf, &file, module, order) != NGX_OK) {
             return NGX_CONF_ERROR;
         }
